@@ -1,0 +1,39 @@
+{%extends "base.html"%}
+{%block title%}Register{%endblock%}
+
+{%block content%}
+
+<div class="container w-50 p-3">
+    <h3>Register</h3>
+<form method="post">
+    <!-- Email input -->
+    <div data-mdb-input-init class="form-outline mb-4">
+      <input type="email" id="form2Example1" class="form-control" name="email"/>
+      <label class="form-label" for="form2Example1">Email address</label>
+    </div>
+  
+    <!-- Password input -->
+    <div data-mdb-input-init class="form-outline mb-4">
+      <input type="password" id="form2Example2" class="form-control" name="password"/>
+      <label class="form-label" for="form2Example2">Password</label>
+    </div>
+
+    <div data-mdb-input-init class="form-outline mb-4">
+      <input type="password" id="form2Example2" class="form-control" name="password2"/>
+      <label class="form-label" for="form2Example2">Confirm Password</label>
+    </div>
+  
+    <!-- 2 column grid layout for inline styling -->
+  
+    <!-- Submit button -->
+    <button  type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-block mb-4">Create Account</button>
+</form>
+    <!-- Register buttons -->
+    <div class="text-center">
+      <p>Already have an account? <a href="/login">Log In</a></p>
+    </div>
+  
+
+</div>
+
+{%endblock%}
