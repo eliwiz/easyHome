@@ -2,9 +2,10 @@
 {%block title%}Register Customer{%endblock%}
 
 {%block content%}
-
+<div class="container w-20">
+  <h2>Create a Customer Account</h2>
+</div>
 <div class="container w-50 p-3">
-    <h3>Create a Customer Account</h3>
 <form method="post">
     <!-- Email input -->
      <div class="row justify-content-center text-center">
@@ -37,7 +38,8 @@
           <label class="form-label" for="form2Example1">Username</label>
         </div>
       </div>
-      <div class="col d-flex gap-1">
+      </div>
+      <div class="row">
         <div data-mdb-input-init class="form-outline mb-4">
           <input type="password" id="form2Example2" class="form-control" name="password"/>
           <label class="form-label" for="form2Example2">Password</label>
@@ -47,23 +49,41 @@
           <input type="password" id="form2Example2" class="form-control" name="password2"/>
           <label class="form-label" for="form2Example2">Confirm Password</label>
         </div>
-      </div>
      </div>
-    
     <div data-mdb-input-init class="form-outline mb-4">
       <input type="tel" id="form2Example1" class="form-control" name="phone" required maxlength="50" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"/>
       <label class="form-label" for="form2Example1">Phone Number (Format: 123-456-7890)</label>
     </div>
 
-    <div class="dropdown">
-      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        Gender
-      </button>
-      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-        <a class="dropdown-item" href="#">Male</a>
-        <a class="dropdown-item" href="#">Female</a>
-        <a class="dropdown-item" href="#">Other/Prefer not to say</a>
-      </div>            
+    <!-- ADDRESS -->
+    <div data-mdb-input-init class="form-outline mb-4">
+      <input type="text" id="form2Example1" class="form-control" name="street/atp" required maxlength="10"/>
+      <label class="form-label" for="form2Example1">Street/Apartment #</label>
+    </div>
+    <div data-mdb-input-init class="form-outline mb-4">
+      <input type="text" id="form2Example1" class="form-control" name="street" required maxlength="35"/>
+      <label class="form-label" for="form2Example1">Street Name</label>
+    </div>
+    <div data-mdb-input-init class="form-outline mb-4">
+      <input type="text" id="form2Example1" class="form-control" name="town" required maxlength="30"/>
+      <label class="form-label" for="form2Example1">Town/City</label>
+    </div>
+    <div data-mdb-input-init class="form-outline mb-4">
+      <input type="text" id="form2Example1" class="form-control" name="state" required maxlength="2"/>
+      <label class="form-label" for="form2Example1">State (abbreviated)</label>
+    </div>
+    <div data-mdb-input-init class="form-outline mb-4">
+      <input type="text" id="form2Example1" class="form-control" name="zip" required maxlength="5"/>
+      <label class="form-label" for="form2Example1">Zip Code</label>
+    </div>
+
+    <div class="form-outline mb-4 dropdown" data-mdb-input-init>
+      <select name="gender" id="gender">
+        <option value="M">Male</option>
+        <option value="F">Female</option>
+        <option value="O">Other/Prefer not to Say</option>
+     </select>  <br>
+     <label class="form-label" for="gender">Choose your Gender</label>          
     </div>
 
     <!-- Password input -->
