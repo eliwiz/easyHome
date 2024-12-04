@@ -27,16 +27,6 @@
               <a class="dropdown-item" href="#">Cooling</a>
             </div>            
           </div>
-          <div class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Price
-            </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <a class="dropdown-item" href="#">Specialty</a>
-              <a class="dropdown-item" href="#">Price</a>
-              <a class="dropdown-item" href="#">Location</a>
-            </div>            
-          </div>
           <div class="input-group rounded w-25">
             <input type="search" class="form-control rounded" placeholder="Zip Code" aria-label="Search" aria-describedby="search-addon" name="search"/>
             <!-- <span class="input-group-text border-0" id="search-addon">
@@ -62,28 +52,28 @@
               <tr>
                 <th scope="col">Name</th>
                 <th scope="col">Expertise</th>
-                <th scope="col">Hourly Price</th>
                 <th scope="col">Phone</th>
                 <th scope="col">Email</th>
                 <th scope="col">Location</th>
+                <th scope="col"></th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td>John Smith</td>
                 <td>Plumbing</td>
-                <td>$23</td>
                 <td>111-111-1111</td>
                 <td>johnsmith@plumbing,co</td>
                 <td>Hackensack</td>
+                <td>Book</td>
               </tr>
               <tr>
                 <td>Sally King</td>
                 <td>Siding</td>
-                <td>$21</td>
                 <td>111-111-1111</td>
                 <td>salking@siding.com</td>
                 <td>Paramus</td>
+                <td><a href="{{url_for('index')}}" class="btn btn-info" role="button">Link Button</a></td>
               </tr>
             </tbody>
           </table>

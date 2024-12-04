@@ -1,4 +1,10 @@
-#add search bar, fix sign in, google maps
+#google mapes (guest will ask for address, user already has it logged in to check for distance)
+#mod on professional names with more details (name, address, past work
+#book button (user info, requests picture and description, date and time for appointment)
+#fix feedback
+#hook up to database
+#set up character limits and update registration
+#email verification
 
 #imports
 from flask import Flask, render_template, request, redirect, url_for, flash, session
@@ -53,6 +59,10 @@ def login():
 @app.route('/full', methods=["GET", "POST"])
 def indexfull():
     return render_template("index_full.html")
+
+@app.route('/test')
+def test():
+    return render_template("test.html")
 
 
 #functions 
