@@ -8,17 +8,17 @@
 
 #imports
 from flask import Flask, render_template, request, redirect, url_for, flash, session
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.exc import IntegrityError
 import os, io
 from werkzeug.utils import secure_filename
-from sqlalchemy import desc, asc
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_mail import Mail
 from flask_mail import Message
 from flask_login import LoginManager, UserMixin
 from flask_login import login_user, current_user, logout_user, login_required
+from functools import wraps
+
+from database import init_db
 
 
 app = Flask(__name__)
@@ -69,4 +69,5 @@ def test():
 
 if __name__ == "__main__":
     app.secret_key = "jfvdjhklvdfhgspierytuepsri5uw43hkjlh" 
+    init_db()
     app.run(debug=True, port="9000")
