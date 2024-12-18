@@ -2,84 +2,121 @@
 {%block title%}Register Customer{%endblock%}
 
 {%block content%}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-6">
+      <h2>Create a Customer Account</h2> <hr>
+      <form method="post">
+        <!-- Email input -->
+        <div class="row">
+          <h4>Basic Information (Required)</h4>
+          <div class="col d-flex gap-1 justify-content-center">
+            <div data-mdb-input-init class="form-outline w-50 mb-3">
+              <input type="text" id="form2Example1" class="form-control" name="fname" required maxlength="25" />
+              <label class="form-label" for="form2Example1">Enter your First Name</label>
+            </div>
+            <div data-mdb-input-init class="form-outline w-50 mb-3">
+              <input type="text" id="form2Example1" class="form-control" name="mname" maxlength="15" />
+              <label class="form-label" for="form2Example1">Enter your Middle Name</label>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div data-mdb-input-init class="form-outline w-100 mb-3">
+            <input type="text" id="form2Example1" class="form-control" name="lname" required maxlength="25" />
+            <label class="form-label" for="form2Example1">Enter your Last Name</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col d-flex gap-1">
+            <div data-mdb-input-init class="form-outline w-50 mb-3">
+              <input type="email" id="form2Example1" class="form-control" name="email" required maxlength="50" />
+              <label class="form-label" for="form2Example1">Email address</label>
+            </div>
 
-<div class="container w-50 p-3">
-    <h3>Create a Customer Account</h3>
-<form method="post">
-    <!-- Email input -->
-     <div class="row justify-content-center text-center">
-      <div class="col d-flex gap-1 justify-content-center">
-        <div data-mdb-input-init class="form-outline mb-4">
-          <input type="text" id="form2Example1" class="form-control" name="fname" required25 maxlength=""/>
-          <label class="form-label" for="form2Example1">Enter your First Name</label>
+            <div data-mdb-input-init class="form-outline mb-3 w-50">
+              <input type="text" id="form2Example1" class="form-control" name="usermane" required maxlength="50" />
+              <label class="form-label" for="form2Example1">Username</label>
+            </div>
+          </div>
         </div>
-        <div data-mdb-input-init class="form-outline mb-4">
-          <input type="text" id="form2Example1" class="form-control" name="mname" maxlength="15"/>
-          <label class="form-label" for="form2Example1">Enter your Middle Name</label>
-        </div>
-      </div>
-     </div>
-     <div class="row">
-      <div data-mdb-input-init class="form-outline mb-4">
-        <input type="text" id="form2Example1" class="form-control" name="lname" required maxlength="25"/>
-        <label class="form-label" for="form2Example1">Enter your Last Name</label>
-      </div>
-     </div>
-     <div class="row">
-      <div class="col d-flex gap-1">
-        <div data-mdb-input-init class="form-outline mb-4">
-          <input type="email" id="form2Example1" class="form-control" name="email" required maxlength="50"/>
-          <label class="form-label" for="form2Example1">Email address</label>
-        </div>
-    
-        <div data-mdb-input-init class="form-outline mb-4">
-          <input type="text" id="form2Example1" class="form-control" name="usermane" required maxlength="50"/>
-          <label class="form-label" for="form2Example1">Username</label>
-        </div>
-      </div>
-      <div class="col d-flex gap-1">
-        <div data-mdb-input-init class="form-outline mb-4">
-          <input type="password" id="form2Example2" class="form-control" name="password"/>
-          <label class="form-label" for="form2Example2">Password</label>
-        </div>
-    
-        <div data-mdb-input-init class="form-outline mb-4">
-          <input type="password" id="form2Example2" class="form-control" name="password2"/>
-          <label class="form-label" for="form2Example2">Confirm Password</label>
-        </div>
-      </div>
-     </div>
-    
-    <div data-mdb-input-init class="form-outline mb-4">
-      <input type="tel" id="form2Example1" class="form-control" name="phone" required maxlength="50" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"/>
-      <label class="form-label" for="form2Example1">Phone Number (Format: 123-456-7890)</label>
-    </div>
+        <div class="row">
+          <div class="col d-flex gap-1">
+            <div data-mdb-input-init class="form-outline mb-3 w-50">
+              <input type="password" id="form2Example2" class="form-control" name="password" />
+              <label class="form-label" for="form2Example2">Password</label>
+            </div>
 
-    <div class="dropdown">
-      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        Gender
-      </button>
-      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-        <a class="dropdown-item" href="#">Male</a>
-        <a class="dropdown-item" href="#">Female</a>
-        <a class="dropdown-item" href="#">Other/Prefer not to say</a>
-      </div>            
-    </div>
+            <div data-mdb-input-init class="form-outline mb-3 w-50">
+              <input type="password" id="form2Example2" class="form-control" name="password2" />
+              <label class="form-label" for="form2Example2">Confirm Password</label>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col d-flex gap-1">
+            <div data-mdb-input-init class="form-outline mb-3 w-50">
+              <input type="tel" id="form2Example1" class="form-control" name="phone" required maxlength="50"
+                pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" />
+              <label class="form-label" for="form2Example1">Phone Number (Format: 123-456-7890)</label>
+            </div>
+            <div class="form-outline mb-3 dropdown w-50" data-mdb-input-init>
+              <select name="gender" id="gender">
+                <option value="M">Male</option>
+                <option value="F">Female</option>
+                <option value="O">Other/Prefer not to Say</option>
+              </select> <br>
+              <label class="form-label" for="gender">Choose your Gender</label>
+            </div>
+          </div>
+        </div>
 
-    <!-- Password input -->
-    
-  
-    <!-- 2 column grid layout for inline styling -->
-  
-    <!-- Submit button -->
-    <button  type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-block mb-4">Create Account</button>
-</form>
-    <!-- Register buttons -->
-    <div class="text-center">
-      <p>Already have an account? <a href="/login">Log In</a></p>
+        <!-- ADDRESS -->
+        <h4>Home Address (Recommended)</h4>
+        <div class="row">
+            <div data-mdb-input-init class="form-outline mb-3 w-100">
+              <input type="text" id="form2Example1" class="form-control" name="street/atp" required maxlength="10" />
+              <label class="form-label" for="form2Example1">Street/Apartment #</label>
+            </div>
+            </div>
+            <div class="row">
+            <div data-mdb-input-init class="form-outline mb-3 w-100">
+              <input type="text" id="form2Example1" class="form-control" name="street" required maxlength="35" />
+              <label class="form-label" for="form2Example1">Street Address</label>
+            </div>
+          </div>
+        <div class="row">
+          <div class="col d-flex gap-1">
+            <div data-mdb-input-init class="form-outline mb-3 w-33">
+              <input type="text" id="form2Example1" class="form-control" name="town" required maxlength="30" />
+              <label class="form-label" for="form2Example1">Town/City</label>
+            </div>
+            <div data-mdb-input-init class="form-outline mb-3 w-33">
+              <input type="text" id="form2Example1" class="form-control" name="state" required maxlength="2" />
+              <label class="form-label" for="form2Example1">State (abbreviated)</label>
+            </div>
+            <div data-mdb-input-init class="form-outline mb-3 w-33">
+              <input type="text" id="form2Example1" class="form-control" name="zip" required maxlength="5" />
+              <label class="form-label" for="form2Example1">Zip Code</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit button -->
+        <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-block mb-3">Create Account</button>
+      </form>
+      <!-- Register buttons -->
+  <div class="text-center">
+    <p>Already have an account? <a href="/login">Log In</a></p>
+  </div>
     </div>
-  
+    <div class="col-6">
+      <img src="static\assets\images\registerCust.jpg"
+        alt="https://www.pexels.com/photo/several-handheld-tools-on-white-printer-paper-301703/" style="width:50rem">
+    </div>
+  </div>
 
 </div>
+
 
 {%endblock%}

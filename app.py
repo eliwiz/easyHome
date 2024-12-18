@@ -1,5 +1,5 @@
 #google mapes (guest will ask for address, user already has it logged in to check for distance)
-#mod on professional names with more details (name, address, past work
+#new page on professional names with more details (name, address, past work, map)
 #book button (user info, requests picture and description, date and time for appointment)
 #fix feedback
 #hook up to database
@@ -39,11 +39,20 @@ def professionals():
 @app.route('/register', methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        email = request.form.get("email")
-        password = request.form.get("password")
-        password2 = request.form.get("password2")
-        flash(f"Logged in with email {email} and password {password} with confirmation password of {password2}", "success")
+        # email = request.form.get("email")
+        # password = request.form.get("password")
+        # password2 = request.form.get("password2")
+        # flash(f"Logged in with email {email} and password {password} with confirmation password of {password2}", "success")
+        pass
     return render_template("register.html")
+
+@app.route("/registerCustomer", methods=["GET", "POST"])
+def registerCust():
+    return render_template("registerCust.html")
+
+@app.route("/registerProfessional", methods=["GET", "POST"])
+def registerProf():
+    return render_template("registerProf.html")
 
 @app.route('/login', methods=["GET", "POST"])
 def login():
@@ -56,6 +65,11 @@ def login():
         flash(f"Logged in with email {email} and password {password}", "success")
     return render_template("login.html")
 
+
+@app.route('/professional/<id>', methods=["GET", "POST"])
+def professionalPage(id):
+    return render_template("profPage.html", id=id)
+
 @app.route('/full', methods=["GET", "POST"])
 def indexfull():
     return render_template("index_full.html")
@@ -63,9 +77,6 @@ def indexfull():
 @app.route('/test')
 def test():
     return render_template("test.html")
-
-
-#functions 
 
 if __name__ == "__main__":
     app.secret_key = "jfvdjhklvdfhgspierytuepsri5uw43hkjlh" 
