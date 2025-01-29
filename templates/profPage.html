@@ -1,143 +1,46 @@
-<!doctype html>
-<html lang="en">
+{% extends "base.html" %}
+{% block title %}{{ id }}{% endblock %}
 
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title> {{id}}</title>
+{% block content %}
+<br><br><br><br><br><br><br><br>
+<div class="container row">
+    <div class="col-6">
+      <h1>ID</h1>
+      
+    </div>
+    <div class="col-6">
+      <div id="response"></div>
+    </div>
 
-  <link rel="stylesheet" type="text/css" href="static/assets/css/vendor.css">
-
-  <!-- Link Swiper's CSS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" />
-
-
-  <!-- Link Bootstrap's CSS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
-
-  <link rel="stylesheet" href="static/assets/css/style.css">
-
-  <!-- Google Fonts ================================================== -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&display=swap"
-    rel="stylesheet">
-
-  <!-- script ================================================== -->
-  <script src="static/assets/js/modernizr.js"></script>
-  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-</head>
-
-<body data-bs-spy="scroll" data-bs-target="#navbar-example2" tabindex="0">
-
-  <!-- nav bar start  -->
-  <header id="nav" class="site-header position-fixed text-white bg-dark">
-    <nav id="navbar-example2" class="navbar navbar-expand-lg py-2">
-
-      <div class="container ">
-
-        <a class="navbar-brand" href="/"><h3>EasyHome</h3></a>
-
-
-        <button class="navbar-toggler text-white" type="button" data-bs-toggle="offcanvas"
-          data-bs-target="#offcanvasNavbar2" aria-controls="offcanvasNavbar2" aria-label="Toggle navigation"><ion-icon
-            name="menu-outline" style="font-size: 30px;"></ion-icon></button>
-
-        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar2"
-          aria-labelledby="offcanvasNavbar2Label">
-          <div class="offcanvas-header">
-            <h5 class="offcanvas-title" id="offcanvasNavbar2Label">Menu</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"
-              aria-label="Close"></button>
-          </div>
-          <div class="offcanvas-body">
-            <ul class="navbar-nav align-items-center justify-content-end align-items-center flex-grow-1 ">
-              <li class="nav-item">
-                <a class="nav-link active me-md-4" href="/">Home</a>
-              </li>
-              <li class="nav-item dropdown ">
-                <a class="nav-link me-md-4 text-center dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
-                  aria-expanded="false">Find a Professional</a>
-                <ul class="dropdown-menu dropdown-menu-dark">
-                  <li><a href="/professionals" class="dropdown-item">Show all</a></li>
-                  <li><a href="/professionals" class="dropdown-item">Foundation</a></li>
-                  <li><a href="/professionals" class="dropdown-item">Priming</a></li>
-                  <li><a href="/professionals" class="dropdown-item">Roof</a></li>
-                  <li><a href="/professionals" class="dropdown-item">Plumbing </a></li>
-                  <li><a href="/professionals" class="dropdown-item">Electrician </a></li>
-                  <li><a href="/professionals" class="dropdown-item">HVAC </a></li>
-                  <li><a href="/professionals" class="dropdown-item">Gutter </a></li>
-                  <li><a href="/professionals" class="dropdown-item">Siding </a></li>
-                  <li><a href="/professionals" class="dropdown-item">Cooling </a></li>
-                </ul>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link me-md-4" href="/">Feedback</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link mx-md-4" href="/login"  >Login</a>
-              </li>
-              </div>
-            </div>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </nav>
-  </header>
-
-
-  {% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    <ul class="flashes">
-        {% for category, message in messages %}
-            <li class="flash {{ category }}">
-                {{ message }}
-                <button class="close" onclick="this.parentElement.style.display='none';">&times;</button>
-            </li>
-        {% endfor %}
-    </ul>
-  {% endif %}
-{% endwith %}
-
-<div class="container">
-    <br><br>
-    <h1>{{id}}</h1>
 </div>
 
-
-
-    <footer class="d-flex flex-wrap justify-content-between align-items-center border-top"></footer>
-
-    <div class="container">
-      <footer class="d-flex flex-wrap justify-content-between align-items-center py-2 ">
-        <div class="col-md-8 d-flex align-items-center">
-          <p>© 2023 TemplatesJungle, Inc. All rights reserved.</p>
-
-        </div>
-        <div class="col-md-4 d-flex align-items-center">
-          <p>HTML template by: <a href="https://templatesjungle.com/" class="link-primary"
-              target="_blank">TemplatesJungle</a> <br> Distributed by: <a href="https://themewagon.com" class="link-primary"
-              target="_blank">ThemeWagon</a></p>
-
-        </div>
-
-      </footer>
-    </div>
-  </section>
-
-
-
-
-  <script src="static/assets/js/jquery-1.11.0.min.js"></script>
-  <script src="static/assets/js/script.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
-    crossorigin="anonymous"></script>
-</body>
-
-</html>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+      const zipcode = prompt("Please enter your ZIP code:");
+      if (zipcode) {
+          // Send the ZIP code to the Flask app
+          fetch("/professional/{{id}}", {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/x-www-form-urlencoded",
+              },
+              body: `zipcode=${encodeURIComponent(zipcode)}`,
+          })
+          .then(response => response.json())
+          .then(data => {
+              if (data.iframe) {
+                  document.getElementById("response").innerHTML = data.iframe;
+              } else if (data.error) {
+                  document.getElementById("response").textContent = data.error;
+              }
+          })
+          .catch(error => {
+              console.error("Error:", error);
+              document.getElementById("response").textContent = "An error occurred.";
+          });
+      } else {
+          document.getElementById("response").textContent = "No ZIP code entered.";
+      }
+  });
+</script>
+{% endblock %}
