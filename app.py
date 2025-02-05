@@ -22,13 +22,46 @@ import sqlite3
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import desc, asc, LargeBinary
 
-
-
 from database import init_db
 con = sqlite3.connect("database.db")
-
+con.row_factory = sqlite3.Row
 
 app = Flask(__name__)
+login_manager = LoginManager(app)
+login_manager.login_view = 'login' #specify the login route
+# Set custom messages
+login_manager.login_message = "Unauthorized Access! Please log in!"
+login_manager.login_message_category = "danger"
+
+class User(UserMixin):
+    def __init__(self, user_row):
+        if user_row:  
+            self.id = user_row["id"]
+            self.first_name = user_row["first_name"]
+            self.middle_name = user_row["middle_name"]
+            self.last_name = user_row["last_name"]
+            self.phone_number = user_row["phone_number"]
+            self.email = user_row["email"]
+            self.password = user_row["password"]  
+
+@login_manager.user_loader
+def load_user(user_id):
+    try:
+        conn = sqlite3.connect('database.db')
+        conn.row_factory = sqlite3.Row  # Enables row-based access
+        c = conn.cursor()
+
+        c.execute("SELECT * FROM users WHERE id = ?", (user_id,))
+        user_row = c.fetchone()
+
+        # Return a User object if the user is found, otherwise return None
+        return User(user_row) if user_row else None
+    except sqlite3.Error as e:
+        print(f"Error retrieving user by ID: {e}")
+        return None
+    finally:
+        if conn:
+            conn.close()
 
 #routes
 @app.route('/', methods=["GET", "POST"])
@@ -86,9 +119,9 @@ def login():
         password = request.form.get("password")
         print(password)
         user = get_user_by_email(email)  
-        print(user) 
-        print(user[7])    
-        if user and user[7] == password:
+        print(user)
+           
+        if user and user.password == password:
             login_user(user)
             flash("Logged in successfully!", "success")
             return redirect(url_for('index'))
@@ -145,15 +178,22 @@ def get_all_users():
         if conn:
             conn.close()
             
+# def get_professionals():
+#         try:
+#             conn= sqlite3.connect("database.db")
+            
+#             c.execute("SELECT * FROM users WHERE ")
+            
 def get_user_by_email(email):
     try:
         conn = sqlite3.connect('database.db')
+        conn.row_factory = sqlite3.Row  # Allows accessing columns by name
         c = conn.cursor()
 
         c.execute("SELECT * FROM users WHERE email = ?", (email,))
-        user = c.fetchone()  
+        user_row = c.fetchone()
 
-        return user
+        return User(user_row) if user_row else None  # Convert row to User object
     except sqlite3.Error as e:
         print(f"Error retrieving user: {e}")
         return None
@@ -202,6 +242,53 @@ def add_prof(first_name, middle_name, last_name, gender, phone_number, email, pa
         if conn:
             conn.close()
 
+def delete_user(user_id):
+    try:
+        conn = sqlite3.connect('database.db')
+        c = conn.cursor()
+
+        c.execute("DELETE FROM users WHERE id = ?", (user_id,))
+        conn.commit()
+
+        if c.rowcount > 0:
+            print(f"User with ID {user_id} deleted successfully")
+            return True
+        else:
+            print(f"No user found with ID {user_id}")
+            return False
+    except sqlite3.Error as e:
+        print(f"Error deleting user: {e}")
+        return False
+    finally:
+        if conn:
+            conn.close()
+
+def edit_user(user_id, first_name, middle_name, last_name, gender, phone_number, email, password):
+    try:
+        conn = sqlite3.connect('database.db')
+        c = conn.cursor()
+
+        c.execute("""
+            UPDATE users 
+            SET first_name = ?, middle_name = ?, last_name = ?, gender = ?, 
+                phone_number = ?, email = ?, password = ?
+            WHERE id = ?
+        """, (first_name, middle_name, last_name, gender, phone_number, email, password, user_id))
+
+        conn.commit()
+
+        if c.rowcount > 0:
+            print(f"User with ID {user_id} updated successfully")
+            return True
+        else:
+            print(f"No user found with ID {user_id}")
+            return False
+    except sqlite3.Error as e:
+        print(f"Error updating user: {e}")
+        return False
+    finally:
+        if conn:
+            conn.close()
 
 
 if __name__ == "__main__":
