@@ -14,7 +14,12 @@ def init_db():
                 gender CHAR(1) CHECK (gender IN ('M','F','O')) NOT NULL,
                 phone_number VARCHAR2(12) NOT NULL,
                 email VARCHAR2(50) NOT NULL,
-                password VARCHAR2(50) NOT NULL
+                password VARCHAR2(50) NOT NULL,
+                street_number VARCHAR2(10),
+                street_name VARCHAR2(35),
+                town VARCHAR2(30),
+                state CHAR(2),
+                zip_code NUMBER(5)
             )
         """)
 

@@ -82,29 +82,48 @@ def register():
 
 @app.route("/registerCustomer", methods=["GET", "POST"])
 def registerCust():
-    fname = request.form.get("fname")
-    mname = request.form.get("mname")
-    lname = request.form.get("lname")
-    email = request.form.get("email")
-    user = request.form.get("user")
-    password = request.form.get("password")
-    password2 = request.form.get("password2")
-    phone = request.form.get("phone")
-    gender = request.form.get("gender")
-    apt = request.form.get("street/atp")
-    street = request.form.get("street")
-    town = request.form.get("town")
-    state = request.form.get("state")
-    zip = request.form.get("zip")
+    if request.method == 'POST':
+        fname = request.form.get("fname")
+        mname = request.form.get("mname")
+        lname = request.form.get("lname")
+        email = request.form.get("email")
+        user = request.form.get("user")
+        password = request.form.get("password")
+        password2 = request.form.get("password2")
+        phone = request.form.get("phone")
+        gender = request.form.get("gender")
+        apt = request.form.get("street/atp")
+        street = request.form.get("street")
+        town = request.form.get("town")
+        state = request.form.get("state")
+        zip = request.form.get("zip")
     
-    if password != password2:
-        flash("Please make sure that your passwords match!", "warning")
-    if add_cust(fname, mname, lname, gender, phone, email, password):
-        flash("User registered successfully!", "success")
-        return redirect(url_for("index"))
-    else:
-        flash("An error occurred while registering the user.", "danger")
+        if password != password2:
+            flash("Please make sure that your passwords match!", "warning")
+        if add_cust(fname, mname, lname, gender, phone, email, password):
+            flash("User registered successfully!", "success")
+            return redirect(url_for("index"))
+        else:
+            flash("An error occurred while registering the user.", "danger")
+        
+        conn = sqlite3.connect('database.db')
+        c = conn.cursor()
+
+        c.execute("SELECT * FROM users WHERE email = ?", (email,))
+        if c.fetchone() is not None:
+            flash("Email already registered!","warning")
+            return render_template("registerCust.html")
+        
+        c.execute("""
+                  INSERT INTO users (
+                  first_name, middle_name, last_name, gender, phone_number, email, password, street_number, street_name, town, state, zip_code)
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) """,(fname,mname,lname,gender,phone,email,password,street_number,street_name,town,state,zip_code))
     
+        conn.commit()
+        flash("Registration successful! Please login.", "success")
+        
+        return redirect(url_for("login"))
+
     return render_template("registerCust.html")
 
 @app.route("/registerProfessional", methods=["GET", "POST"])
@@ -289,6 +308,18 @@ def edit_user(user_id, first_name, middle_name, last_name, gender, phone_number,
     finally:
         if conn:
             conn.close()
+
+@app.route('/logout')
+@login_required
+def logout():
+    try: 
+        logout_user()
+        flash("You have been logged out!","success")
+        return redirect(url_for('index'))
+    except Exception as e:
+        flash("An error occurred during logout.", "danger")
+        return redirect(url_for('index'))
+
 
 
 if __name__ == "__main__":
