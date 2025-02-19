@@ -23,6 +23,15 @@ def init_db():
             )
         """)
 
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS professionals (
+                  id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  profession VARCHAR2(50) NOT NULL,
+                  hourly_cost DECIMAL(10,2),
+                  FOREIGN KEY (user_id) REFERENCES users(id)
+                  )
+                  """)
+
         conn.commit()
         print("Database initialization successful")
     

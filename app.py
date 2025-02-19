@@ -128,6 +128,8 @@ def registerCust():
 
 @app.route("/registerProfessional", methods=["GET", "POST"])
 def registerProf():
+    if request.method == "POST":
+        pass
     return render_template("registerProf.html")
 
 @app.route('/login', methods=["GET", "POST"])
