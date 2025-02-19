@@ -42,9 +42,7 @@
         <a class="navbar-brand" href="/"><h3>EasyHome</h3></a>
 
 
-        <button class="navbar-toggler text-white" type="button" data-bs-toggle="offcanvas"
-          data-bs-target="#offcanvasNavbar2" aria-controls="offcanvasNavbar2" aria-label="Toggle navigation"><ion-icon
-            name="menu-outline" style="font-size: 30px;"></ion-icon></button>
+        <button class="navbar-toggler text-white" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar2" aria-controls="offcanvasNavbar2" aria-label="Toggle navigation"><ion-icon name="menu-outline" style="font-size: 30px;"></ion-icon></button>
 
         <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar2"
           aria-labelledby="offcanvasNavbar2Label">
@@ -75,13 +73,25 @@
                 </ul>
               </li>
               <li class="nav-item">
-                <a class="nav-link me-md-4" href="/">Feedback</a>
+                <a class="nav-link me-md-4" href="/feedback">Feedback</a>
               </li>
-              <li class="nav-item">
-                <a class="nav-link mx-md-4" href="/login"  >Login</a>
+                {%if current_user.first_name != null%}
+                <li class="nav-item dropdown ">
+                  <a class="nav-link me-md-4 text-center dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
+                    aria-expanded="false">Profile</a>
+                  <ul class="dropdown-menu dropdown-menu-dark">
+                    <li><a href="/professionals" class="dropdown-item">Edit User Information</a></li>
+                    <li><a href="/professionals" class="dropdown-item">Manage Projects</a></li>
+                    <li><hr></li>
+                    <li><a href="/logout" class="dropdown-item">Log Out </a></li>
+                  </ul>
+                </li>
+                {%else%}
+                <li class="nav-item">
+                  <a class="nav-link mx-md-4" href="/login">Login</a>
+                </li>
+                {%endif%}
               </li>
-              </div>
-            </div>
             </ul>
           </div>
         </div>
@@ -171,10 +181,9 @@
 
         </div>
         <div class="col-md-4 d-flex align-items-center">
-          <p>HTML template by: <a href="https://templatesjungle.com/" class="link-primary"
-              target="_blank">TemplatesJungle</a> <br> Distributed by: <a href="https://themewagon.com" class="link-primary"
+          <p>HTML template by: <a rel="noopener" href="https://templatesjungle.com/" class="link-primary"
+              target="_blank">TemplatesJungle</a> <br> Distributed by: <a rel="noopener" href="https://themewagon.com" class="link-primary"
               target="_blank">ThemeWagon</a></p>
-
         </div>
 
       </footer>

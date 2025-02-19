@@ -2,87 +2,127 @@
 {%block title%}Find a Professional{%endblock%}
 
 {%block content%}
-<section id="feature">
-    <div class="container py-5">
-      <div class="row">
-        <div class="section-header align-center mb-5">
-          <h2 class=" text-capitalize m-0">Find a Professional</h2>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-8 d-flex gap-2">
-          <div class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Specialty
-            </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <a class="dropdown-item" href="#">Foundation</a>
-              <a class="dropdown-item" href="#">Priming</a>
-              <a class="dropdown-item" href="#">Roof</a>
-              <a class="dropdown-item" href="#">Plumbing</a>
-              <a class="dropdown-item" href="#">Electrician</a>
-              <a class="dropdown-item" href="#">HVAC</a>
-              <a class="dropdown-item" href="#">Gutter</a>
-              <a class="dropdown-item" href="#">Siding</a>
-              <a class="dropdown-item" href="#">Cooling</a>
-            </div>            
-          </div>
-          <div class="input-group rounded w-25">
-            <input type="search" class="form-control rounded" placeholder="Zip Code" aria-label="Search" aria-describedby="search-addon" name="search"/>
-            <!-- <span class="input-group-text border-0" id="search-addon">
-              <i class="fas fa-search"></i>
-            </span> -->
-          </div>
-        </div>
-        <div class="col-4">
-          <form method="POST">
-          <div class="input-group rounded">
-            <input type="search" class="form-control rounded" placeholder="Search" aria-label="Search" aria-describedby="search-addon" name="search"/>
-            <!-- <span class="input-group-text border-0" id="search-addon">
-              <i class="fas fa-search"></i>
-            </span> -->
-          </div>
-        </form>
-        </div>
-      </div>
-      <br>
-      <div class="row">
-        <table class="table table-striped table-light">
-            <thead>
-              <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Expertise</th>
-                <th scope="col">Phone</th>
-                <th scope="col">Email</th>
-                <th scope="col">Location</th>
-                <th scope="col"></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td> <a href="/professional/John">John Smith</a></td>
-                <td>Plumbing</td>
-                <td>111-111-1111</td>
-                <td>johnsmith@plumbing,co</td>
-                <td>Hackensack</td>
-                <td>Book</td>
-              </tr>
-              <tr>
-                <td>Sally King</td>
-                <td>Siding</td>
-                <td>111-111-1111</td>
-                <td>salking@siding.com</td>
-                <td>Paramus</td>
-                <td><a href="{{url_for('index')}}" class="btn btn-info" role="button">Link Button</a></td>
-              </tr>
-            </tbody>
-          </table>
-      </div>
-      
 
-
-      
+<div class="container-fluid">
+  <div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-3 col-lg-2 d-md-block bg-dark text-white sidebar vh-100 position-fixed">
+      <div class="p-3">
+        <a href="/" class="d-flex align-items-center mb-3 mb-md-0 text-white text-decoration-none">
+          <span class="fs-4">Filter Professionals</span>
+        </a>
+        <hr>
+        <li><h4>Expertise</h4>
+          <input type="checkbox" id="Foundation" value="Foundation">
+          <label for="Foundation">Foundation</label><br>
+          <input type="checkbox" id="Priming" value="Priming">
+          <label for="Priming">Priming</label><br>
+          <input type="checkbox" id="Roof" value="Roof">
+          <label for="Roof">Roof</label><br>
+          <input type="checkbox" id="Plumbing" value="Plumbing">
+          <label for="Plumbing">Plumbing</label><br>
+          <input type="checkbox" id="Electrician" value="Electrician">
+          <label for="Electrician">Electrician</label><br>
+          <input type="checkbox" id="Gutter" value="Gutter">
+          <label for="Gutter">Gutter</label><br>
+          <input type="checkbox" id="Siding" value="Siding">
+          <label for="Siding">Siding</label><br>
+          <input type="checkbox" id="Cooling" value="Cooling">
+          <label for="Cooling">Cooling</label><br>
+          </li> <br>
+          <!-- <li>
+            <div class="dropdown">
+              <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                <button class="btn btn dropdown" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Expertise
+                </button>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+                <li><a class="dropdown-item" href="#">Foundation</a></li>
+                <li><a class="dropdown-item" href="#">Priming</a></li>
+                <li><a class="dropdown-item" href="#">Roof</a></li>
+                <li><a class="dropdown-item" href="#">Plumbing</a></li>
+                <li><a class="dropdown-item" href="#">Electrician</a></li>
+                <li><a class="dropdown-item" href="#">HVAC</a></li>
+                <li><a class="dropdown-item" href="#">Gutter</a></li>
+                <li><a class="dropdown-item" href="#">Siding</a></li>
+                <li><a class="dropdown-item" href="#">Cooling</a></li>
+              </ul>
+            </div>
+          </li> -->
+        </li>
+          <li>
+            <h4>Location</h4>
+            <div class="input-group rounded">
+              <input type="search" class="form-control rounded" placeholder="Zip Code" aria-label="Search" aria-describedby="search-addon" name="search"/>
+            </div>
+          </li>
+        </ul>
+      </div>
     </div>
-  </section>
+
+    <!-- Main Content -->
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 offset-md-3">
+      <section id="feature">
+        <div class="container py-5">
+          <div class="row">
+            <div class="col-8 d-flex gap-2">
+              <h2>Find a Professional</h2>
+            </div>
+            <div class="col-4">
+              <form method="POST">
+                <div class="input-group rounded">
+                  <input type="search" class="form-control rounded" placeholder="Search by Name" aria-label="Search" aria-describedby="search-addon" name="search"/>
+                </div>
+              </form>
+            </div>
+          </div>
+          <br>
+          <div class="row">
+            <table class="table table-striped table-light">
+              <thead>
+                <tr>
+                  <th scope="col">Name</th>
+                  <th scope="col">Expertise</th>
+                  <th scope="col">Phone</th>
+                  <th scope="col">Email</th>
+                  <th scope="col">Location</th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {%for prof in professionals%}
+                <tr>
+                  <td>{{prof.first_name}} {{prof.last_name}}</td>
+                  <td>no row yet :c</td>
+                  <td>{{prof.phone_number}}</td>
+                  <td>nada</td>
+                  <td>{{prof.id}}</td>
+                </tr>
+                {%endfor%}
+                <tr>
+                  <td> <a href="/professional/John">John Smith</a></td>
+                  <td>Plumbing</td>
+                  <td>111-111-1111</td>
+                  <td>johnsmith@plumbing.co</td>
+                  <td>Hackensack</td>
+                  <td>Book</td>
+                </tr>
+                <tr>
+                  <td>Sally King</td>
+                  <td>Siding</td>
+                  <td>111-111-1111</td>
+                  <td>salking@siding.com</td>
+                  <td>Paramus</td>
+                  <td><a href="{{url_for('index')}}" class="btn btn-info" role="button">Link Button</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
 
 {%endblock%}

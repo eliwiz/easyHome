@@ -1,10 +1,12 @@
 #google mapes (guest will ask for address, user already has it logged in to check for distance)
 #new page on professional names with more details (name, address, past work, map)
 #book button (user info, requests picture and description, date and time for appointment)
-#fix feedback
 #hook up to database
-#set up character limits and update registration
 #email verification
+#click on hackensack, pop up with google maps, directions from user address to professional address with 
+#ADD RATING column on professional (click on to show past customer feedback)
+#functionality for searching (nearby zipcodes, within how many miles)
+
 
 #imports
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
@@ -28,11 +30,12 @@ con.row_factory = sqlite3.Row
 
 app = Flask(__name__)
 login_manager = LoginManager(app)
-login_manager.login_view = 'login' #specify the login route
-# Set custom messages
+login_manager.login_view = 'login' 
+# Login required messages
 login_manager.login_message = "Unauthorized Access! Please log in!"
 login_manager.login_message_category = "danger"
 
+#SQL3 databases do not work with UserMixin, *should* create temporary object in order for UserMixin to work properly
 class User(UserMixin):
     def __init__(self, user_row):
         if user_row:  
@@ -48,13 +51,12 @@ class User(UserMixin):
 def load_user(user_id):
     try:
         conn = sqlite3.connect('database.db')
-        conn.row_factory = sqlite3.Row  # Enables row-based access
+        conn.row_factory = sqlite3.Row  
         c = conn.cursor()
 
         c.execute("SELECT * FROM users WHERE id = ?", (user_id,))
         user_row = c.fetchone()
 
-        # Return a User object if the user is found, otherwise return None
         return User(user_row) if user_row else None
     except sqlite3.Error as e:
         print(f"Error retrieving user by ID: {e}")
@@ -68,42 +70,58 @@ def load_user(user_id):
 def index():
     return render_template("index.html")
 
-@app.route('/professionals', methods=["GET", "POST"])
-def professionals():
+@app.route('/login', methods=["GET", "POST"])
+def login():
     if request.method == "POST":
-        search = request.form.get("search")
-        flash(f"Searched up {search}", "success")
-        
-    return render_template("professionals.html")
-    
+        email = request.form.get("email")
+        password = request.form.get("password")
+        user = get_user_by_email(email)  
+           
+        if user and user.password == password:
+            login_user(user)
+            flash(f"Welcome {user.first_name}", "success")
+            return redirect(url_for('index'))
+        else:
+            flash("Invalid credentials!","danger")
+    return render_template("login.html")
+
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user() 
+    flash("Logged out successfully", "success")
+    return redirect(url_for("index"))
+
+#REGISTER PAGES
 @app.route('/register', methods=["GET", "POST"])
 def register():
     return render_template("register.html")
-
+   
 @app.route("/registerCustomer", methods=["GET", "POST"])
 def registerCust():
-    fname = request.form.get("fname")
-    mname = request.form.get("mname")
-    lname = request.form.get("lname")
-    email = request.form.get("email")
-    user = request.form.get("user")
-    password = request.form.get("password")
-    password2 = request.form.get("password2")
-    phone = request.form.get("phone")
-    gender = request.form.get("gender")
-    apt = request.form.get("street/atp")
-    street = request.form.get("street")
-    town = request.form.get("town")
-    state = request.form.get("state")
-    zip = request.form.get("zip")
+    if request.method == "POST":
+        fname = request.form.get("fname")
+        mname = request.form.get("mname")
+        lname = request.form.get("lname")
+        email = request.form.get("email")
+        user = request.form.get("user")
+        password = request.form.get("password")
+        password2 = request.form.get("password2")
+        phone = request.form.get("phone")
+        gender = request.form.get("gender")
+        apt = request.form.get("street/atp")
+        street = request.form.get("street")
+        town = request.form.get("town")
+        state = request.form.get("state")
+        zip = request.form.get("zip")
     
-    if password != password2:
-        flash("Please make sure that your passwords match!", "warning")
-    if add_cust(fname, mname, lname, gender, phone, email, password):
-        flash("User registered successfully!", "success")
-        return redirect(url_for("index"))
-    else:
-        flash("An error occurred while registering the user.", "danger")
+        if password != password2:
+            flash("Please make sure that your passwords match!", "warning")
+        if add_cust(fname, mname, lname, gender, phone, email, password):
+            flash("User registered successfully!", "success")
+            return redirect(url_for("index"))
+        else:
+            flash("An error occurred while registering the user.", "danger")
     
     return render_template("registerCust.html")
 
@@ -111,30 +129,20 @@ def registerCust():
 def registerProf():
     return render_template("registerProf.html")
 
-@app.route('/login', methods=["GET", "POST"])
-def login():
+#Professional pages (viewing as customer)
+@app.route('/professionals', methods=["GET", "POST"])
+def professionals():
+    list = get_all_users()
     if request.method == "POST":
-        email = request.form.get("email")
-        print(email)
-        password = request.form.get("password")
-        print(password)
-        user = get_user_by_email(email)  
-        print(user)
-           
-        if user and user.password == password:
-            login_user(user)
-            flash("Logged in successfully!", "success")
-            return redirect(url_for('index'))
-        else:
-            flash("Invalid credentials!","danger")
-    return render_template("login.html")
-
+        search = request.form.get("search")
+        flash(f"Searched up {search}", "success")   
+    return render_template("professionals.html", professionals=list)
+ 
 @app.route('/professional/<id>', methods=["GET", "POST"])
 def professionalPage(id):
     if request.method == "POST":
         zipcode = request.form.get("zipcode")
         if zipcode:
-            # Replace with your actual Google Maps Embed API key
             api_key = "AIzaSyDmYpBjV12iq8-83OxZMK8aujT1AWxb8Sc"
             iframe_html = Markup(f"""
             <iframe
@@ -152,6 +160,45 @@ def professionalPage(id):
             return jsonify({"error": "No ZIP code provided."}), 400  # Bad request
     return render_template("profPage.html", id=id)
 
+@app.route('/schedule/<id>', methods=["GET", "POST"])
+@login_required
+def bookprof():
+    # if request.method == "GET":
+    #     if request.args.get("profId"):
+    #         profId = int(request.args.get("profId"))
+    #         professional = get_user_by_id(profId)
+    #         return render_template("bookProf.html", prof = professional)
+    #     return redirect(url_for("index"))
+    return render_template("bookProf.html")
+
+#Customer onlt pages (checking things they booked, updating info)
+@app.route("/editCustomer", methods=["POST", "GET"])
+@login_required
+def editCustomer():
+    userInformation = get_user_by_id(current_user.id)
+    return render_template("editCust.html", userInfo= userInformation)
+
+@app.route("/manageBookings")
+@login_required
+def manageBookings():
+    return render_template("manageBookings.html")
+
+#Professional only pages (checking their appointments, updating info)
+@app.route("/manageJobs", methods=['GET', "POST"])
+@login_required
+def manageJobs():
+    return render_template("manageJobs.html")
+
+@app.route("/editProfessional", methods=['GET', "POST"])
+@login_required
+def editProf():
+    return render_template("editProf.html")
+
+#Unimportant pages, likely to get cut at end
+@app.route("/feedback", methods=["GET" , "POST"])
+def feedback():
+    return render_template("feedback.html")
+
 @app.route('/full', methods=["GET", "POST"])
 def indexfull():
     return render_template("index_full.html")
@@ -161,14 +208,14 @@ def test():
     return render_template("test.html")
 
 #FUNCTIONS
-
 def get_all_users():
     try:
         conn = sqlite3.connect('database.db')
+        conn.row_factory = sqlite3.Row  
         c = conn.cursor()
-
+        
         c.execute("SELECT * FROM users")
-        users = c.fetchall()
+        users = [dict(row) for row in c.fetchall()]  
 
         return users  
     except sqlite3.Error as e:
@@ -177,6 +224,7 @@ def get_all_users():
     finally:
         if conn:
             conn.close()
+
             
 # def get_professionals():
 #         try:
@@ -184,16 +232,33 @@ def get_all_users():
             
 #             c.execute("SELECT * FROM users WHERE ")
             
+def get_user_by_id(user_id):
+    try:
+        conn = sqlite3.connect('database.db')
+        conn.row_factory = sqlite3.Row  
+        c = conn.cursor()
+
+        c.execute("SELECT * FROM users WHERE id = ?", (user_id,))
+        user_row = c.fetchone()
+
+        return User(user_row) if user_row else None  
+    except sqlite3.Error as e:
+        print(f"Error retrieving user: {e}")
+        return None
+    finally:
+        if conn:
+            conn.close()
+
 def get_user_by_email(email):
     try:
         conn = sqlite3.connect('database.db')
-        conn.row_factory = sqlite3.Row  # Allows accessing columns by name
+        conn.row_factory = sqlite3.Row  
         c = conn.cursor()
 
         c.execute("SELECT * FROM users WHERE email = ?", (email,))
         user_row = c.fetchone()
 
-        return User(user_row) if user_row else None  # Convert row to User object
+        return User(user_row) if user_row else None  
     except sqlite3.Error as e:
         print(f"Error retrieving user: {e}")
         return None

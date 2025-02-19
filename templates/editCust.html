@@ -1,11 +1,11 @@
 {%extends "base.html"%}
-{%block title%}Register Professional{%endblock%}
+{%block title%}Edit Your Account{%endblock%}
 
 {%block content%}
 <div class="container-fluid">
   <div class="row">
     <div class="col-6">
-      <h2>Create a Professional Account</h2> <hr>
+      <h2>Edit Account</h2> <hr>
       <form method="post">
         <!-- Email input -->
         <div class="row">
@@ -70,51 +70,36 @@
             </div>
           </div>
         </div>
-        <hr>
-        <!-- Professional Info -->
-        <h4>Professional Information</h4>
+
+        <!-- ADDRESS -->
+        <h4>Home Address (Recommended)</h4>
         <div class="row">
-          <h5>Expertise(s)</h5>
-            <div>
-              <div class="row">
-                <div class="col-4">
-                  <input type="checkbox" id="Foundation" value="Foundation">
-                  <label for="Foundation">Foundation</label><br>
-                </div>
-                <div class="col-4">
-                  <input type="checkbox" id="Priming" value="Priming">
-                  <label for="Priming">Priming</label><br>
-                </div>
-                <div class="col-4">
-                  <input type="checkbox" id="Roof" value="Roof">
-                  <label for="Roof">Roof</label><br>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-4">
-                  <input type="checkbox" id="Plumbing" value="Plumbing">
-                  <label for="Plumbing">Plumbing</label><br>
-                </div>
-                <div class="col-4">
-                  <input type="checkbox" id="Electrician" value="Electrician">
-                  <label for="Electrician">Electrician</label><br>
-                </div>
-                <div class="col-4">
-                  <input type="checkbox" id="Gutter" value="Gutter">
-                  <label for="Gutter">Gutter</label><br>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-6">
-                  <input type="checkbox" id="Siding" value="Siding">
-                  <label for="Siding">Siding</label><br>
-                </div>
-                <div class="col-6"> 
-                  <input type="checkbox" id="Cooling" value="Cooling">
-                  <label for="Cooling">Cooling</label><br>
-                </div>
-              </div>
+            <div data-mdb-input-init class="form-outline mb-3 w-100">
+              <input type="text" id="form2Example1" class="form-control" name="street/atp" maxlength="10" />
+              <label class="form-label" for="form2Example1">Street/Apartment #</label>
             </div>
+            </div>
+            <div class="row">
+            <div data-mdb-input-init class="form-outline mb-3 w-100">
+              <input type="text" id="form2Example1" class="form-control" name="street" maxlength="35" />
+              <label class="form-label" for="form2Example1">Street Address</label>
+            </div>
+          </div>
+        <div class="row">
+          <div class="col d-flex gap-1">
+            <div data-mdb-input-init class="form-outline mb-3 w-33">
+              <input type="text" id="form2Example1" class="form-control" name="town" maxlength="30" />
+              <label class="form-label" for="form2Example1">Town/City</label>
+            </div>
+            <div data-mdb-input-init class="form-outline mb-3 w-33">
+              <input type="text" id="form2Example1" class="form-control" name="state" maxlength="2" />
+              <label class="form-label" for="form2Example1">State (abbreviated)</label>
+            </div>
+            <div data-mdb-input-init class="form-outline mb-3 w-33">
+              <input type="text" id="form2Example1" class="form-control" name="zip" maxlength="5" />
+              <label class="form-label" for="form2Example1">Zip Code</label>
+            </div>
+          </div>
         </div>
 
         <!-- Submit button -->
@@ -132,5 +117,6 @@
   </div>
 
 </div>
+
 
 {%endblock%}

@@ -1,46 +1,55 @@
-{% extends "base.html" %}
-{% block title %}{{ id }}{% endblock %}
+{%extends "base.html"%}
+{%block title%}Meet {{prof.first_name}}{%endblock%}
 
-{% block content %}
-<br><br><br><br><br><br><br><br>
-<div class="container row">
-    <div class="col-6">
-      <h1>ID</h1>
-      
+{%block content%}
+
+<section id="start">
+    <div class="container my-5 py-5">
+      <div class="row featurette py-lg-5 ">
+        <div class="col-md-5 order-md-1 d-flex">
+          <h1 class="text-capitalize  lh-1 mb-3">Meet {{prof.first_name}} {{prof.last_name}}</h1>
+          <h3>They are from LOCATION, and have SPECIALITIES</h3>
+          <h5>STARS</h5>
+          
+        </div>
+        <div class="col-md-7 order-md-2">
+            <div id="response"></div>
+            <div>
+                <h4>Past Reviews:</h4>
+            </div>
+        </div>
+      </div>
     </div>
-    <div class="col-6">
-      <div id="response"></div>
-    </div>
+  </section>
 
-</div>
-
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-      const zipcode = prompt("Please enter your ZIP code:");
-      if (zipcode) {
-          // Send the ZIP code to the Flask app
-          fetch("/professional/{{id}}", {
-              method: "POST",
-              headers: {
-                  "Content-Type": "application/x-www-form-urlencoded",
-              },
-              body: `zipcode=${encodeURIComponent(zipcode)}`,
-          })
-          .then(response => response.json())
-          .then(data => {
-              if (data.iframe) {
-                  document.getElementById("response").innerHTML = data.iframe;
-              } else if (data.error) {
-                  document.getElementById("response").textContent = data.error;
-              }
-          })
-          .catch(error => {
-              console.error("Error:", error);
-              document.getElementById("response").textContent = "An error occurred.";
-          });
-      } else {
-          document.getElementById("response").textContent = "No ZIP code entered.";
-      }
-  });
-</script>
-{% endblock %}
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const zipcode = prompt("Please enter your ZIP code:");
+        if (zipcode) {
+            // Send the ZIP code to the Flask app
+            fetch("/professional/{{id}}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: `zipcode=${encodeURIComponent(zipcode)}`,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.iframe) {
+                    document.getElementById("response").innerHTML = data.iframe;
+                } else if (data.error) {
+                    document.getElementById("response").textContent = data.error;
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                document.getElementById("response").textContent = "An error occurred.";
+            });
+        } else {
+            document.getElementById("response").textContent = "No ZIP code entered.";
+        }
+    });
+  </script>
+  {% endblock %}
+  
