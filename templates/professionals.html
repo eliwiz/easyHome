@@ -12,52 +12,46 @@
           <span class="fs-4">Filter Professionals</span>
         </a>
         <hr>
-        <li><h4>Expertise</h4>
-          <input type="checkbox" id="Foundation" value="Foundation">
+
+        <form method="POST">
+          <h4>Expertise</h4>
+          <input type="checkbox" id="Foundation" name="expertise" value="Foundation">
           <label for="Foundation">Foundation</label><br>
-          <input type="checkbox" id="Priming" value="Priming">
+          <input type="checkbox" id="Priming" name="expertise" value="Priming">
           <label for="Priming">Priming</label><br>
-          <input type="checkbox" id="Roof" value="Roof">
+          <input type="checkbox" id="Roof" name="expertise" value="Roof">
           <label for="Roof">Roof</label><br>
-          <input type="checkbox" id="Plumbing" value="Plumbing">
+          <input type="checkbox" id="Plumbing" name="expertise" value="Plumbing">
           <label for="Plumbing">Plumbing</label><br>
-          <input type="checkbox" id="Electrician" value="Electrician">
+          <input type="checkbox" id="Electrician" name="expertise" value="Electrician">
           <label for="Electrician">Electrician</label><br>
-          <input type="checkbox" id="Gutter" value="Gutter">
+          <input type="checkbox" id="Gutter" name="expertise" value="Gutter">
           <label for="Gutter">Gutter</label><br>
-          <input type="checkbox" id="Siding" value="Siding">
+          <input type="checkbox" id="Siding" name="expertise" value="Siding">
           <label for="Siding">Siding</label><br>
-          <input type="checkbox" id="Cooling" value="Cooling">
+          <input type="checkbox" id="Cooling" name="expertise" value="Cooling">
           <label for="Cooling">Cooling</label><br>
-          </li> <br>
-          <!-- <li>
-            <div class="dropdown">
-              <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                <button class="btn btn dropdown" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Expertise
-                </button>
-              </a>
-              <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-                <li><a class="dropdown-item" href="#">Foundation</a></li>
-                <li><a class="dropdown-item" href="#">Priming</a></li>
-                <li><a class="dropdown-item" href="#">Roof</a></li>
-                <li><a class="dropdown-item" href="#">Plumbing</a></li>
-                <li><a class="dropdown-item" href="#">Electrician</a></li>
-                <li><a class="dropdown-item" href="#">HVAC</a></li>
-                <li><a class="dropdown-item" href="#">Gutter</a></li>
-                <li><a class="dropdown-item" href="#">Siding</a></li>
-                <li><a class="dropdown-item" href="#">Cooling</a></li>
-              </ul>
-            </div>
-          </li> -->
-        </li>
-          <li>
-            <h4>Location</h4>
-            <div class="input-group rounded">
-              <input type="search" class="form-control rounded" placeholder="Zip Code" aria-label="Search" aria-describedby="search-addon" name="search"/>
-            </div>
-          </li>
-        </ul>
+
+          <hr>
+
+          <h4>Location</h4>
+          <div class="input-group rounded">
+            <input type="search" class="form-control rounded" placeholder="Zip Code" aria-label="Search"
+              aria-describedby="search-addon" name="zip_code" />
+          </div>
+
+          <select class="form-select" aria-label="Miles away" name="distance">
+            <option selected value="">Miles away (range)</option>
+            <option value="5">5 miles or less</option>
+            <option value="10">10 miles or less</option>
+            <option value="25">25 miles or less</option>
+            <option value="1000">Greater than 25 miles</option>
+          </select>
+
+          <br>
+
+          <button type="submit" class="btn btn-primary w-100" name="filters">Apply Filters</button>
+        </form>
       </div>
     </div>
 
@@ -72,7 +66,8 @@
             <div class="col-4">
               <form method="POST">
                 <div class="input-group rounded">
-                  <input type="search" class="form-control rounded" placeholder="Search by Name" aria-label="Search" aria-describedby="search-addon" name="search"/>
+                  <input type="search" class="form-control rounded" placeholder="Search by Name" aria-label="Search"
+                    aria-describedby="search-addon" name="search" />
                 </div>
               </form>
             </div>
@@ -94,28 +89,38 @@
                 {%for prof in professionals%}
                 <tr>
                   <td>{{prof.first_name}} {{prof.last_name}}</td>
-                  <td>no row yet :c</td>
+                  <td>no row yet</td>
                   <td>{{prof.phone_number}}</td>
                   <td>nada</td>
-                  <td>{{prof.id}}</td>
+                  <td><button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
+                      data-bs-target="#exampleModal{{ loop.index }}">
+                      {{prof.town}}
+                    </button>
+
+                    <div class="modal fade" id="exampleModal{{ loop.index }}" tabindex="-1"
+                      aria-labelledby="exampleModalLabel" aria-hidden="true">
+                      <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="exampleModalLabel">{{ prof.name }}</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            <iframe width="600" height="450" style="border:0" loading="lazy" allowfullscreen
+                              referrerpolicy="no-referrer-when-downgrade"
+                              src="https://www.google.com/maps/embed/v1/directions?key=AIzaSyDmYpBjV12iq8-83OxZMK8aujT1AWxb8Sc&origin={{prof.zip_code}}&destination=City+Hall,New+York,NY">
+                            </iframe>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><a href="{{url_for('index')}}" class="btn btn-info" role="button">Book</a></td>
                 </tr>
                 {%endfor%}
-                <tr>
-                  <td> <a href="/professional/John">John Smith</a></td>
-                  <td>Plumbing</td>
-                  <td>111-111-1111</td>
-                  <td>johnsmith@plumbing.co</td>
-                  <td>Hackensack</td>
-                  <td>Book</td>
-                </tr>
-                <tr>
-                  <td>Sally King</td>
-                  <td>Siding</td>
-                  <td>111-111-1111</td>
-                  <td>salking@siding.com</td>
-                  <td>Paramus</td>
-                  <td><a href="{{url_for('index')}}" class="btn btn-info" role="button">Link Button</a></td>
-                </tr>
               </tbody>
             </table>
           </div>

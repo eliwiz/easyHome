@@ -3,8 +3,6 @@
 #book button (user info, requests picture and description, date and time for appointment)
 #hook up to database
 #email verification
-#click on hackensack, pop up with google maps, directions from user address to professional address with 
-#ADD RATING column on professional (click on to show past customer feedback)
 #functionality for searching (nearby zipcodes, within how many miles)
 
 
@@ -92,6 +90,14 @@ def logout():
     flash("Logged out successfully", "success")
     return redirect(url_for("index"))
 
+@app.route("/admin", methods=["GET", "POST"])
+def admin():
+    list = get_all_users()
+    if request.method == "POST":
+        user_id = "delete_cart_item"
+        delete_user(user_id)
+    return render_template("admin.html", users=list)
+
 #REGISTER PAGES
 @app.route('/register', methods=["GET", "POST"])
 def register():
@@ -101,7 +107,7 @@ def register():
 def registerCust():
     if request.method == 'POST':
         if request.method == "POST":
-        fname = request.form.get("fname")
+            fname = request.form.get("fname")
             mname = request.form.get("mname")
             lname = request.form.get("lname")
             email = request.form.get("email")
@@ -118,7 +124,7 @@ def registerCust():
     
         if password != password2:
             flash("Please make sure that your passwords match!", "warning")
-        if add_cust(fname, mname, lname, gender, phone, email, password):
+        if add_cust(fname, mname, lname, gender, phone, email, password, apt, street, town, state, zip):
             flash("User registered successfully!", "success")
             return redirect(url_for("index"))
         else:
@@ -155,8 +161,18 @@ def registerProf():
 def professionals():
     list = get_all_users()
     if request.method == "POST":
-        search = request.form.get("search")
-        flash(f"Searched up {search}", "success")   
+        if "filters" in request.form:
+            zip = request.form.get("zip_code")
+            selected_distance = request.form.get("distance")
+            
+            if selected_distance != None:
+                upper = int(zip) + int(selected_distance)
+                lower = int(zip) - int(selected_distance)
+                list = get_users_by_zip_range(int(lower), int(upper))
+            else:
+                list = get_users_by_zip(int(zip))
+                
+        
     return render_template("professionals.html", professionals=list)
  
 @app.route('/professional/<id>', methods=["GET", "POST"])
@@ -287,15 +303,63 @@ def get_user_by_email(email):
         if conn:
             conn.close()
 
-def add_cust(first_name, middle_name, last_name, gender, phone_number, email, password):
+def get_users_by_zip(zip_code):
+    try:
+        conn = sqlite3.connect('database.db')
+        conn.row_factory = sqlite3.Row  
+        c = conn.cursor()
+
+        c.execute("""
+            SELECT * FROM users
+            WHERE zip_code = ?
+        """, (zip_code,))
+
+        user_row = c.fetchall()  
+        return User(user_row) if user_row else None  
+
+    except sqlite3.Error as e:
+        print(f"Error retrieving users: {e}")
+        return []
+    
+    finally:
+        if conn:
+            conn.close()
+
+def get_users_by_zip_range(lower, upper):
+    try:
+        conn = sqlite3.connect('database.db')
+        conn.row_factory = sqlite3.Row  
+        c = conn.cursor()
+
+        c.execute("""
+            SELECT * FROM users
+            WHERE zip_code BETWEEN ? AND ?
+        """, (lower, upper))
+
+        user_rows = c.fetchall()  
+        return [User(row) for row in user_rows] 
+
+    except sqlite3.Error as e:
+        print(f"Error retrieving users: {e}")
+        return []
+    
+    finally:
+        if conn:
+            conn.close()
+
+
+def add_cust(first_name, middle_name, last_name, gender, phone_number, email, password, 
+             street_number, street_name, town, state, zip_code):
     try:
         conn = sqlite3.connect('database.db')
         c = conn.cursor()
 
         c.execute("""
-            INSERT INTO users (first_name, middle_name, last_name, gender, phone_number, email, password)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, (first_name, middle_name, last_name, gender, phone_number, email, password))
+            INSERT INTO users (first_name, middle_name, last_name, gender, phone_number, email, password, 
+                               street_number, street_name, town, state, zip_code)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (first_name, middle_name, last_name, gender, phone_number, email, password, 
+              street_number, street_name, town, state, zip_code))
 
         conn.commit()
         print("User added successfully")
@@ -375,19 +439,7 @@ def edit_user(user_id, first_name, middle_name, last_name, gender, phone_number,
     finally:
         if conn:
             conn.close()
-
-@app.route('/logout')
-@login_required
-def logout():
-    try: 
-        logout_user()
-        flash("You have been logged out!","success")
-        return redirect(url_for('index'))
-    except Exception as e:
-        flash("An error occurred during logout.", "danger")
-        return redirect(url_for('index'))
-
-
+            
 
 if __name__ == "__main__":
     app.secret_key = "jfvdjhklvdfhgspierytuepsri5uw43hkjlh" 

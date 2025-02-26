@@ -1,0 +1,5 @@
+<form method="POST">
+    {%for user in users%}
+    {{user.id}} {{user.name}} {{user.zip_code}} <button type="submit" class="btn btn-light" name="{{prof.id}}"> DELETE </button>
+    {%endfor%}
+</form>
