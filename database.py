@@ -20,6 +20,7 @@ def init_db():
                 town VARCHAR2(30),
                 state CHAR(2),
                 zip_code NUMBER(5)
+                user_type VARCHAR2(20) CHECK (user_type IN ('customer','professional')) DEFAULT 'customer'
             )
         """)
 
@@ -27,10 +28,25 @@ def init_db():
             CREATE TABLE IF NOT EXISTS professionals (
                   id INTEGER PRIMARY KEY AUTOINCREMENT,
                   profession VARCHAR2(50) NOT NULL,
+                  profession VARCHAR2(50) NOT NULL,
                   hourly_cost DECIMAL(10,2),
+                  description TEXT,
+                  is_verified BOOLEAN DEFAULT 0,
                   FOREIGN KEY (user_id) REFERENCES users(id)
-                  )
-                  """)
+            )
+        """)
+        
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS reviews (
+                  id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  customer_id INTEGER NOT NULL,
+                  professional_id INTEGER NOT NULL,
+                  rating INTEGER CHECK(rating BETWEEN 1 AND 5) NOT NULL,
+                  comment TEXT,
+                  FOREIGN KEY (user_id) REFERENCES users(id),
+                  FOREIGN KEY (professional_id) REFERENCES professionals(id)
+            )
+        """)
 
         conn.commit()
         print("Database initialization successful")
