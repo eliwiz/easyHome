@@ -19,8 +19,8 @@ from flask_login import LoginManager, UserMixin
 from flask_login import login_user, current_user, logout_user, login_required
 from functools import wraps
 import sqlite3
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import desc, asc, LargeBinary
+# from flask_sqlalchemy import SQLAlchemy
+# from sqlalchemy import desc, asc, LargeBinary
 
 from database import init_db
 con = sqlite3.connect("database.db")
@@ -107,6 +107,7 @@ def register():
 def registerCust():
     if request.method == 'POST':
         if request.method == "POST":
+            fname = request.form.get("fname")
             fname = request.form.get("fname")
             mname = request.form.get("mname")
             lname = request.form.get("lname")
