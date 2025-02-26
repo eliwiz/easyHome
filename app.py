@@ -21,8 +21,8 @@ from flask_login import LoginManager, UserMixin
 from flask_login import login_user, current_user, logout_user, login_required
 from functools import wraps
 import sqlite3
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import desc, asc, LargeBinary
+# from flask_sqlalchemy import SQLAlchemy
+# from sqlalchemy import desc, asc, LargeBinary
 
 from database import init_db
 con = sqlite3.connect("database.db")
@@ -101,7 +101,7 @@ def register():
 def registerCust():
     if request.method == 'POST':
         if request.method == "POST":
-        fname = request.form.get("fname")
+            fname = request.form.get("fname")
             mname = request.form.get("mname")
             lname = request.form.get("lname")
             email = request.form.get("email")
@@ -375,19 +375,6 @@ def edit_user(user_id, first_name, middle_name, last_name, gender, phone_number,
     finally:
         if conn:
             conn.close()
-
-@app.route('/logout')
-@login_required
-def logout():
-    try: 
-        logout_user()
-        flash("You have been logged out!","success")
-        return redirect(url_for('index'))
-    except Exception as e:
-        flash("An error occurred during logout.", "danger")
-        return redirect(url_for('index'))
-
-
 
 if __name__ == "__main__":
     app.secret_key = "jfvdjhklvdfhgspierytuepsri5uw43hkjlh" 
