@@ -105,26 +105,26 @@ def register():
    
 @app.route("/registerCustomer", methods=["GET", "POST"])
 def registerCust():
-    if request.method == 'POST':
-        if request.method == "POST":
-            fname = request.form.get("fname")
-            fname = request.form.get("fname")
-            mname = request.form.get("mname")
-            lname = request.form.get("lname")
-            email = request.form.get("email")
-            user = request.form.get("user")
-            password = request.form.get("password")
-            password2 = request.form.get("password2")
-            phone = request.form.get("phone")
-            gender = request.form.get("gender")
-            apt = request.form.get("street/atp")
-            street = request.form.get("street")
-            town = request.form.get("town")
-            state = request.form.get("state")
-            zip = request.form.get("zip")
-    
+    if request.method == "POST":
+        fname = request.form.get("fname")
+        fname = request.form.get("fname")
+        mname = request.form.get("mname")
+        lname = request.form.get("lname")
+        email = request.form.get("email")
+        user = request.form.get("user")
+        password = request.form.get("password")
+        password2 = request.form.get("password2")
+        phone = request.form.get("phone")
+        gender = request.form.get("gender")
+        apt = request.form.get("street/atp")
+        street = request.form.get("street")
+        town = request.form.get("town")
+        state = request.form.get("state")
+        zip = request.form.get("zip")
+
         if password != password2:
             flash("Please make sure that your passwords match!", "warning")
+            return redirect(url_for("login"))
         if add_cust(fname, mname, lname, gender, phone, email, password, apt, street, town, state, zip):
             flash("User registered successfully!", "success")
             return redirect(url_for("index"))
@@ -140,27 +140,67 @@ def registerCust():
             return render_template("registerCust.html")
         
         c.execute("""
-                  INSERT INTO users (
-                  first_name, middle_name, last_name, gender, phone_number, email, password, street_number, street_name, town, state, zip_code)
-                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) """,(fname,mname,lname,gender,phone,email,password,street_number,street_name,town,state,zip_code))
+                INSERT INTO users (
+                first_name, middle_name, last_name, gender, phone_number, email, password, street_number, street_name, town, state, zip_code)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) """,(fname,mname,lname,gender,phone,email,password,street_number,street_name,town,state,zip_code))
+    
+        conn.commit()
+        flash("Registration successful! Please login.", "success")
+        
+        return redirect(url_for("login"))
+    return render_template("registerCust.html")
+
+@app.route("/registerProfessional", methods=["GET", "POST"])
+def registerProf():
+    if request.method == "POST":
+        fname = request.form.get("fname")
+        mname = request.form.get("mname")
+        lname = request.form.get("lname")
+        email = request.form.get("email")
+        user = request.form.get("user")
+        password = request.form.get("password")
+        password2 = request.form.get("password2")
+        phone = request.form.get("phone")
+        gender = request.form.get("gender")
+        apt = request.form.get("street/atp")
+        street = request.form.get("street")
+        town = request.form.get("town")
+        state = request.form.get("state")
+        zip = request.form.get("zip")
+
+        if password != password2:
+            flash("Please make sure that your passwords match!", "warning")
+            return redirect(url_for("login"))
+        if add_cust(fname, mname, lname, gender, phone, email, password, apt, street, town, state, zip):
+            flash("User registered successfully!", "success")
+            return redirect(url_for("index"))
+        else:
+            flash("An error occurred while registering the user.", "danger")
+            
+        conn = sqlite3.connect('database.db')
+        c = conn.cursor()
+
+        c.execute("SELECT * FROM users WHERE email = ?", (email,))
+        if c.fetchone() is not None:
+            flash("Email already registered!","warning")
+            return render_template("registerProf.html")
+        
+        c.execute("""
+                INSERT INTO users (
+                first_name, middle_name, last_name, gender, phone_number, email, password, street_number, street_name, town, state, zip_code, user_type)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) """,(fname,mname,lname,gender,phone,email,password,street_number,street_name,town,state,zip_code,"professional"))
     
         conn.commit()
         flash("Registration successful! Please login.", "success")
         
         return redirect(url_for("login"))
 
-    return render_template("registerCust.html")
-
-@app.route("/registerProfessional", methods=["GET", "POST"])
-def registerProf():
-    if request.method == "POST":
-        pass
     return render_template("registerProf.html")
 
 #Professional pages (viewing as customer)
 @app.route('/professionals', methods=["GET", "POST"])
 def professionals():
-    list = get_all_users()
+    list = get_professionals()
     if request.method == "POST":
         if "filters" in request.form:
             zip = request.form.get("zip_code")
@@ -264,11 +304,23 @@ def get_all_users():
             conn.close()
 
             
-# def get_professionals():
-#         try:
-#             conn= sqlite3.connect("database.db")
-            
-#             c.execute("SELECT * FROM users WHERE ")
+def get_professionals():
+    try:
+        conn = sqlite3.connect("database.db")
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+        
+        c.execute("SELECT * FROM professionals")
+        professionals = [dict(row) for row in c.fetchall()]
+
+        return professionals
+    except sqlite3.Error as e:
+        print(f"Error retrieving users: {e}")
+        return []
+    finally:
+        if conn:
+            conn.close()
+
             
 def get_user_by_id(user_id):
     try:
