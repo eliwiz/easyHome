@@ -47,6 +47,18 @@ def init_db():
             )
         """)
 
+        # copy work address from users
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS workDetails (
+                  id iNTEGER PRIMARY KEY AUTOINCREMENT,
+                  work_id NUMBER(15),
+                  work_name VARCHAR2(50),
+                  work_description VARCHAR2(100),
+                  FOREIGN KEY (user_id) REFERENCES users(id),
+                  FOREIGN KEY (professional_id) REFERENCES professionals(id)
+            )      
+        """)
+
         conn.commit()
         print("Database initialization successful")
     
