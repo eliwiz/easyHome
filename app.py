@@ -186,6 +186,8 @@ def registerProf():
         state = request.form.get("state")
         special = request.form.get('service')
         zip = request.form.get("zip")
+        hourly = request.form.get("hourly")
+        desc = request.form.get("desc")
         expertise = request.form.getlist("expertise[]")
 
         professions = ",".join(expertise)
@@ -203,11 +205,12 @@ def registerProf():
             return render_template("registerProf.html")
         conn.close()
 
-        if add_prof(fname, mname, lname, gender, phone, email, password, apt, street, town, state, zip, professions):
+        if add_prof(fname, mname, lname, gender, phone, email, password, apt, street, town, state, zip, expertise, hourly, desc):
             flash("User registered successfully!", "success")
             return redirect(url_for("login"))
         else:
             flash("An error occurred while registering the user.", "danger")
+
         
     return render_template("registerProf.html")
 
@@ -273,6 +276,7 @@ def createReservation(profId):
         description = request.form.get("desc")
 
         if add_work_detail(current_user.id, prof_id, title, description):
+            print("IT WORKED???")
             flash("Professional created sucessfully!", "success")
             return url_for("manageReservations")
     return url_for("index")
@@ -287,7 +291,8 @@ def editCustomer():
 @app.route("/manageReservations")
 @login_required
 def manageReservations():
-    return render_template("manageReservations.html")
+    reserved = get_work_details_by_user(current_user.id)
+    return render_template("manageReservations.html", reservations = reserved)
 
 #Professional only pages (checking their appointments, updating info)
 @app.route("/manageJobs", methods=['GET', "POST"])
@@ -588,6 +593,28 @@ def get_users_by_zip_range(lower, upper):
             conn.close()
 
 
+def get_work_details_by_user(user_id):
+    try:
+        conn = sqlite3.connect("database.db")
+        conn.row_factory = sqlite3.Row  
+        c = conn.cursor()
+
+        c.execute("""
+            SELECT * FROM workDetails
+            WHERE user_id = ?
+        """, (user_id,))
+
+        work_rows = c.fetchall()  
+        return [dict(row) for row in work_rows]  
+
+    except sqlite3.Error as e:
+        print(f"Error retrieving work details: {e}")
+        return []
+    
+    finally:
+        if conn:
+            conn.close()
+
 def add_acc(first_name, middle_name, last_name, gender, phone_number, email, password, 
              street_number, street_name, town, state, zip_code, user_type):
     try:
@@ -631,7 +658,7 @@ def add_work_detail(user_id, professional_id, work_id, work_name, work_descripti
     finally:
         conn.close()
 
-def add_prof(user_id, profession, hourly_cost, description, is_verified=0):
+def add_prof(first_name, middle_name, last_name, gender, phone_number, email, password, street_number, street_name, town, state, zip_code, professions, hourly_cost, description, is_verified=0):
     try:
         conn = sqlite3.connect('database.db')
         c = conn.cursor()
@@ -646,7 +673,7 @@ def add_prof(user_id, profession, hourly_cost, description, is_verified=0):
         c.execute("""
             INSERT INTO professionals (user_id, profession, hourly_cost, description)
             VALUES (?, ?, ?, ?)
-        """, (user_id, professions, 10.00, "this is a test"))
+        """, (user_id, "Plumber", 10.00, "this is a test"))
 
         conn.commit()
 

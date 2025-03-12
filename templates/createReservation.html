@@ -14,9 +14,12 @@
       </div>
       
       <!-- Right side (2/3 width) -->
+       
       <div class="col-md-8">
+        <form action="POST">
         <div class="text-content ps-md-5">
           <h4>Enter your project</h4>
+          <input type="hidden" id="profID" name="profID" value="{{prof.id}}">
           <div data-mdb-input-init class="form-outline mb-3 w-33">
               <input type="text" id="form2Example1" class="form-control" name="title" maxlength="50" />
               <label class="form-label" for="form2Example1">Project Title</label>
@@ -27,6 +30,7 @@
             </div>
           <a href="/manageReservations" class="btn btn-primary btn-lg px-4 me-md-2">Submit Project Proposal</a>
         </div>
+      </form>
       </div>
     </div>
   </div>
