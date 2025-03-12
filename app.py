@@ -19,8 +19,6 @@ from flask_login import LoginManager, UserMixin
 from flask_login import login_user, current_user, logout_user, login_required
 from functools import wraps
 import sqlite3
-# from flask_sqlalchemy import SQLAlchemy
-# from sqlalchemy import desc, asc, LargeBinary
 
 from database import init_db, reset_db
 con = sqlite3.connect("database.db")
@@ -54,9 +52,14 @@ class User(UserMixin):
             self.first_name = user_row["first_name"]
             self.middle_name = user_row["middle_name"]
             self.last_name = user_row["last_name"]
+            self.gender = user_row["gender"]
             self.phone_number = user_row["phone_number"]
             self.email = user_row["email"]
             self.password = user_row["password"]  
+            self.street_name = user_row["street_name"]
+            self.town = user_row["town"]
+            self.state = user_row["state"]
+            self.zip_code = user_row["zip_code"]
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -183,49 +186,35 @@ def registerProf():
         state = request.form.get("state")
         special = request.form.get('service')
         zip = request.form.get("zip")
-        hourly = int(request.form.get("hourly"))
-        desc = request.form.get("desc")
+        expertise = request.form.getlist("expertise[]")
+
+        professions = ",".join(expertise)
 
         if password != password2:
             flash("Please make sure that your passwords match!", "warning")
-            return redirect(url_for("login"))
-            
-        try:
-            conn = sqlite3.connect('database.db')
-            c = conn.cursor()
-
-            # Register user first
-            c.execute("""
-                INSERT INTO users (first_name, middle_name, last_name, gender, phone_number, email, password, 
-                                   street_number, street_name, town, state, zip_code, user_type)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (fname, mname, lname, gender, phone, email, password, apt, street, town, state, zip, "professional"))
-
-            # Get user ID of newly registered professional
-            user_id = c.lastrowid
-
-            # Register as a professional
-            if user_id:
-                if add_prof(user_id, special, hourly, desc):
-                    conn.commit()
-                    flash("Professional registered successfully!", "success")
-                    return redirect(url_for("index"))
-                else:
-                    flash("Error adding professional details.", "danger")
-
-        except sqlite3.Error as e:
-            flash(f"An error occurred: {e}", "danger")
-        finally:
-            conn.close()
+            return redirect(url_for("registerProf"))
         
-        return redirect(url_for("login"))
+        conn = sqlite3.connect('database.db')
+        c = conn.cursor()
+        c.execute("SELECT * FROM users WHERE email = ?", (email,))
+        if c.fetchone() is not None:
+            conn.close()
+            flash("Email already registered!", "warning")
+            return render_template("registerProf.html")
+        conn.close()
 
+        if add_prof(fname, mname, lname, gender, phone, email, password, apt, street, town, state, zip, professions):
+            flash("User registered successfully!", "success")
+            return redirect(url_for("login"))
+        else:
+            flash("An error occurred while registering the user.", "danger")
+        
     return render_template("registerProf.html")
 
 #Professional pages (viewing as customer)
 @app.route('/professionals', methods=["GET", "POST"])
 def professionals():
-    list = get_all_users()
+    list = get_professionals()
     user_zip = ""
     if current_user.is_authenticated:
         user_zip = get_user_by_id(current_user.id).zip_code
@@ -311,6 +300,75 @@ def manageJobs():
 def editProf():
     return render_template("editProf.html")
 
+@app.route('/submit_review/<professional_id>', methods=["GET", "POST"])
+@login_required
+def submit_review(professional_id):
+    if request.method == "POST":
+        rating = request.form.get("rating")
+        comment = request.form.get("comment")
+        
+        # Validate the rating
+        try:
+            rating = int(rating)
+            if rating < 1 or rating > 5:
+                flash("Rating must be between 1 and 5", "danger")
+                return redirect(request.url)
+        except ValueError:
+            flash("Invalid rating value", "danger")
+            return redirect(request.url)
+        
+        # Get the professional's user_id
+        professional = get_professional_by_id(professional_id)
+        if not professional:
+            flash("Professional not found", "danger")
+            return redirect(url_for('professionals'))
+        
+        # Add the review
+        if add_review(current_user.id, professional_id, rating, comment):
+            flash("Review submitted successfully", "success")
+            return redirect(url_for('professionals'))
+        else:
+            flash("Failed to submit review", "danger")
+            return redirect(request.url)
+    
+    # GET request - show the form
+    professional = get_professional_by_id(professional_id)
+    if not professional:
+        flash("Professional not found", "danger")
+        return redirect(url_for('professionals'))
+    
+    return render_template("submit_review.html", prof=professional)
+
+@app.route('/reviews/<professional_id>')
+def view_reviews(professional_id):
+    try:
+        professional = get_professional_by_id(professional_id)
+        if not professional:
+            flash("Professional not found", "danger")
+            return redirect(url_for('professionals'))
+            
+        conn = sqlite3.connect('database.db')
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+        
+        c.execute("""
+            SELECT r.*, u.first_name, u.last_name
+            FROM reviews r
+            JOIN users u ON r.customer_id = u.id
+            WHERE r.professional_id = ?
+            ORDER BY r.id DESC
+        """, (professional_id,))
+        
+        reviews = [dict(row) for row in c.fetchall()]
+        return render_template('reviews.html', professional=professional, reviews=reviews)
+    except sqlite3.Error as e:
+        print(f"Error retrieving reviews: {e}")
+        flash("An error occurred while retrieving reviews", "danger")
+        return redirect(url_for('professionals'))
+    finally:
+        if conn:
+            conn.close()
+
 #Unimportant pages, likely to get cut at end
 @app.route('/full', methods=["GET", "POST"])
 def indexfull():
@@ -321,6 +379,48 @@ def test():
     return render_template("test.html")
 
 #FUNCTIONS
+def get_professional_by_id(professional_id):
+    try:
+        conn = sqlite3.connect('database.db')
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+        
+        c.execute("""
+            SELECT professionals.*, users.first_name, users.last_name
+            FROM professionals
+            JOIN users ON professionals.user_id = users.id
+            WHERE professionals.id = ?
+        """, (professional_id,))
+        
+        row = c.fetchone()
+        return dict(row) if row else None
+    except sqlite3.Error as e:
+        print(f"Error retrieving professional: {e}")
+        return None
+    finally:
+        if conn:
+            conn.close()
+
+def get_professional_rating(professional_id):
+    try:
+        conn = sqlite3.connect('database.db')
+        c = conn.cursor()
+        
+        c.execute("""
+            SELECT AVG(rating) as avg_rating 
+            FROM reviews 
+            WHERE professional_id = ?
+        """, (professional_id,))
+        
+        result = c.fetchone()
+        return round(result[0], 1) if result[0] is not None else "No ratings"
+    except sqlite3.Error as e:
+        print(f"Error getting rating: {e}")
+        return "Error"
+    finally:
+        if conn:
+            conn.close()
+
 def check_columns():
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
@@ -354,17 +454,39 @@ def get_professionals():
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
         
-        c.execute("SELECT * FROM professionals")
+        # Get professionals with their details
+        c.execute("""
+            SELECT u.id as user_id, u.first_name, u.last_name, u.town, u.zip_code, 
+                   p.id as prof_id, p.profession, p.hourly_cost, p.description
+            FROM users u
+            JOIN professionals p ON u.id = p.user_id
+            WHERE u.user_type = 'professional'
+        """)
         professionals = [dict(row) for row in c.fetchall()]
-
+        
+        # Add ratings for each professional
+        for prof in professionals:
+            c.execute("""
+                SELECT AVG(rating) as avg_rating, COUNT(id) as review_count
+                FROM reviews
+                WHERE professional_id = ?
+            """, (prof['prof_id'],))
+            
+            rating_data = c.fetchone()
+            if rating_data:
+                prof['avg_rating'] = round(rating_data['avg_rating'], 1) if rating_data['avg_rating'] else 0
+                prof['review_count'] = rating_data['review_count']
+            else:
+                prof['avg_rating'] = 0
+                prof['review_count'] = 0
+                
         return professionals
     except sqlite3.Error as e:
-        print(f"Error retrieving users: {e}")
+        print(f"Error retrieving professionals: {e}")
         return []
     finally:
         if conn:
             conn.close()
-
             
 def get_user_by_id(user_id):
     try:
@@ -480,7 +602,6 @@ def add_acc(first_name, middle_name, last_name, gender, phone_number, email, pas
               street_number, street_name, town, state, zip_code, user_type))
 
         conn.commit()
-        print("User added successfully")
         return True  
     except sqlite3.Error as e:
         print(f"Error adding user: {e}")
@@ -516,13 +637,21 @@ def add_prof(user_id, profession, hourly_cost, description, is_verified=0):
         c = conn.cursor()
 
         c.execute("""
-            INSERT INTO professionals (id, profession, hourly_cost, description, is_verified)
-            VALUES (?, ?, ?, ?, ?)
-        """, (user_id, profession, hourly_cost, description, is_verified))
+            INSERT INTO users (first_name, middle_name, last_name, gender, phone_number, email, password, street_number, street_name, town, state, zip_code, user_type)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (first_name, middle_name, last_name, gender, phone_number, email, password, 
+              street_number, street_name, town, state, zip_code, "professional"))
+        
+        user_id = c.lastrowid
+        c.execute("""
+            INSERT INTO professionals (user_id, profession, hourly_cost, description)
+            VALUES (?, ?, ?, ?)
+        """, (user_id, professions, 10.00, "this is a test"))
 
         conn.commit()
-        print("Professional added successfully")
-        return True
+
+        print(f"Professional added successfully with ID {user_id}")
+        return True  
     except sqlite3.Error as e:
         print(f"Error adding professional: {e}")
         return False

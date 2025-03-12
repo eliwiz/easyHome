@@ -27,6 +27,7 @@ def init_db():
         c.execute("""
             CREATE TABLE IF NOT EXISTS professionals (
                   id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  user_id INTEGER NOT NULL,
                   profession VARCHAR2(50) NOT NULL,
                   hourly_cost DECIMAL(10,2),
                   description TEXT,
@@ -42,7 +43,7 @@ def init_db():
                   professional_id INTEGER NOT NULL,
                   rating INTEGER CHECK(rating BETWEEN 1 AND 5) NOT NULL,
                   comment TEXT,
-                  FOREIGN KEY (user_id) REFERENCES users(id),
+                  FOREIGN KEY (customer_id) REFERENCES users(id),
                   FOREIGN KEY (professional_id) REFERENCES professionals(id)
             )
         """)
