@@ -1,9 +1,10 @@
 #google mapes (guest will ask for address, user already has it logged in to check for distance)
-#new page on professional names with more details (name, address, past work, map)
 #book button (user info, requests picture and description, date and time for appointment)
-#hook up to database
 #email verification
 #functionality for searching (nearby zipcodes, within how many miles)
+#search by zip, show rows of email and phone number
+#only show when booking an appointment^^
+#send email to professional once appointment is made
 
 
 #imports
@@ -26,7 +27,7 @@ from database import init_db
 con = sqlite3.connect("database.db")
 con.row_factory = sqlite3.Row
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="static")
 login_manager = LoginManager(app)
 login_manager.login_view = 'login' 
 # Login required messages
@@ -66,6 +67,8 @@ def load_user(user_id):
 #routes
 @app.route('/', methods=["GET", "POST"])
 def index():
+    # check_columns()
+    # add_review(customer_id=1, professional_id=2, rating=5, comment="Excellent work!")
     return render_template("index.html")
 
 @app.route('/login', methods=["GET", "POST"])
@@ -161,6 +164,10 @@ def registerProf():
 @app.route('/professionals', methods=["GET", "POST"])
 def professionals():
     list = get_all_users()
+    user_zip = ""
+    if current_user.is_authenticated:
+        user_zip = get_user_by_id(current_user.id).zip_code
+        
     if request.method == "POST":
         if "filters" in request.form:
             zip = request.form.get("zip_code")
@@ -170,44 +177,47 @@ def professionals():
                 upper = int(zip) + int(selected_distance)
                 lower = int(zip) - int(selected_distance)
                 list = get_users_by_zip_range(int(lower), int(upper))
+                for user in list:
+                    print(vars(user))  # Prints the attributes of each User object as a dictionary
             else:
                 list = get_users_by_zip(int(zip))
+        if "name" in request.form:
+            name = request.form.get("search")
+            list = get_users_by_name(name)
                 
         
-    return render_template("professionals.html", professionals=list)
+    return render_template("professionals.html", professionals=list, user_zip=user_zip)
  
-@app.route('/professional/<id>', methods=["GET", "POST"])
-def professionalPage(id):
-    if request.method == "POST":
-        zipcode = request.form.get("zipcode")
-        if zipcode:
-            api_key = "AIzaSyDmYpBjV12iq8-83OxZMK8aujT1AWxb8Sc"
-            iframe_html = Markup(f"""
-            <iframe
-              width="600"
-              height="450"
-              style="border:0"
-              loading="lazy"
-              allowfullscreen
-              referrerpolicy="no-referrer-when-downgrade"
-              src="https://www.google.com/maps/embed/v1/directions?key={api_key}&origin={zipcode}&destination=City+Hall,New+York,NY">
-            </iframe>
-            """)
-            return jsonify({"iframe": str(iframe_html)})
-        else:
-            return jsonify({"error": "No ZIP code provided."}), 400  # Bad request
-    return render_template("profPage.html", id=id)
+# @app.route('/professional/<id>', methods=["GET", "POST"])
+# def professionalPage(id):
+#     if request.method == "POST":
+#         zipcode = request.form.get("zipcode")
+#         if zipcode:
+#             api_key = "AIzaSyDmYpBjV12iq8-83OxZMK8aujT1AWxb8Sc"
+#             iframe_html = Markup(f"""
+#             <iframe
+#               width="600"
+#               height="450"
+#               style="border:0"
+#               loading="lazy"
+#               allowfullscreen
+#               referrerpolicy="no-referrer-when-downgrade"
+#               src="https://www.google.com/maps/embed/v1/directions?key={api_key}&origin={zipcode}&destination=City+Hall,New+York,NY">
+#             </iframe>
+#             """)
+#             return jsonify({"iframe": str(iframe_html)})
+#         else:
+#             return jsonify({"error": "No ZIP code provided."}), 400  # Bad request
+#     return render_template("profPage.html", id=id)
 
-@app.route('/schedule/<id>', methods=["GET", "POST"])
-@login_required
-def bookprof():
-    # if request.method == "GET":
-    #     if request.args.get("profId"):
-    #         profId = int(request.args.get("profId"))
-    #         professional = get_user_by_id(profId)
-    #         return render_template("bookProf.html", prof = professional)
-    #     return redirect(url_for("index"))
-    return render_template("bookProf.html")
+@app.route('/createReservation/<profId>', methods=["GET", "POST"])
+# @login_required
+def createReservation(profId):
+    if request.method == "GET":
+        if request.method == "GET":
+            professional = get_user_by_id(profId)
+            return render_template("createReservation.html", prof=professional)
+    return url_for("index")
 
 #Customer onlt pages (checking things they booked, updating info)
 @app.route("/editCustomer", methods=["POST", "GET"])
@@ -216,10 +226,10 @@ def editCustomer():
     userInformation = get_user_by_id(current_user.id)
     return render_template("editCust.html", userInfo= userInformation)
 
-@app.route("/manageBookings")
+@app.route("/manageReservations")
 @login_required
-def manageBookings():
-    return render_template("manageBookings.html")
+def manageReservations():
+    return render_template("manageReservations.html")
 
 #Professional only pages (checking their appointments, updating info)
 @app.route("/manageJobs", methods=['GET', "POST"])
@@ -233,10 +243,6 @@ def editProf():
     return render_template("editProf.html")
 
 #Unimportant pages, likely to get cut at end
-@app.route("/feedback", methods=["GET" , "POST"])
-def feedback():
-    return render_template("feedback.html")
-
 @app.route('/full', methods=["GET", "POST"])
 def indexfull():
     return render_template("index_full.html")
@@ -246,6 +252,15 @@ def test():
     return render_template("test.html")
 
 #FUNCTIONS
+def check_columns():
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute("PRAGMA table_info(users)")
+    columns = c.fetchall()
+    for col in columns:
+        print(col)
+    conn.close()
+
 def get_all_users():
     try:
         conn = sqlite3.connect('database.db')
@@ -310,13 +325,34 @@ def get_users_by_zip(zip_code):
         conn.row_factory = sqlite3.Row  
         c = conn.cursor()
 
+        c.execute("SELECT * FROM users WHERE zip_code = ?", (zip_code,))
+        users = [dict(row) for row in c.fetchall()]
+
+        print(users)  # Debugging line to check output
+        return users  
+
+    except sqlite3.Error as e:
+        print(f"Error retrieving users: {e}")
+        return []
+    
+    finally:
+        if conn:
+            conn.close()
+
+            
+def get_users_by_name(name):
+    try:
+        conn = sqlite3.connect('database.db')
+        conn.row_factory = sqlite3.Row  
+        c = conn.cursor()
+
         c.execute("""
             SELECT * FROM users
-            WHERE zip_code = ?
-        """, (zip_code,))
+            WHERE first_name LIKE ? OR last_name LIKE ?
+        """, (f"%{name}%", f"%{name}%"))
 
-        user_row = c.fetchall()  
-        return User(user_row) if user_row else None  
+        user_rows = c.fetchall()  
+        return [User(row) for row in user_rows] 
 
     except sqlite3.Error as e:
         print(f"Error retrieving users: {e}")
@@ -437,6 +473,27 @@ def edit_user(user_id, first_name, middle_name, last_name, gender, phone_number,
     except sqlite3.Error as e:
         print(f"Error updating user: {e}")
         return False
+    finally:
+        if conn:
+            conn.close()
+            
+            
+def add_review(customer_id, professional_id, rating, comment):
+    try:
+        conn = sqlite3.connect('database.db')
+        c = conn.cursor()
+
+        c.execute("""
+            INSERT INTO reviews (customer_id, professional_id, rating, comment)
+            VALUES (?, ?, ?, ?)
+        """, (customer_id, professional_id, rating, comment))
+
+        conn.commit()
+        print("Review added successfully")
+        return True  
+    except sqlite3.Error as e:
+        print(f"Error adding review: {e}")
+        return False  
     finally:
         if conn:
             conn.close()

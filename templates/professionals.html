@@ -41,7 +41,7 @@
           </div>
 
           <select class="form-select" aria-label="Miles away" name="distance">
-            <option selected value="">Miles away (range)</option>
+            <option selected value="0">Miles away (range)</option>
             <option value="5">5 miles or less</option>
             <option value="10">10 miles or less</option>
             <option value="25">25 miles or less</option>
@@ -57,30 +57,28 @@
 
     <!-- Main Content -->
     <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 offset-md-3">
-      <section id="feature">
-        <div class="container py-5">
-          <div class="row">
-            <div class="col-8 d-flex gap-2">
-              <h2>Find a Professional</h2>
+        <section id="feature">
+          <div class="container py-5">
+            <div class="row align-items-center mb-3">
+              <div class="col-md-8">
+                <h2>Find a Professional</h2>
+              </div>
+              <div class="col-md-4">
+                <form method="POST">
+                  <div class="input-group">
+                    <input type="search" class="form-control" placeholder="Search by Name" name="search" />
+                    <button type="submit" class="btn btn-primary" name="name">Search</button>
+                  </div>
+                </form>
+              </div>
             </div>
-            <div class="col-4">
-              <form method="POST">
-                <div class="input-group rounded">
-                  <input type="search" class="form-control rounded" placeholder="Search by Name" aria-label="Search"
-                    aria-describedby="search-addon" name="search" />
-                </div>
-              </form>
-            </div>
-          </div>
-          <br>
           <div class="row">
             <table class="table table-striped table-light">
               <thead>
                 <tr>
                   <th scope="col">Name</th>
+                  <th scope="col">Rating</th>
                   <th scope="col">Expertise</th>
-                  <th scope="col">Phone</th>
-                  <th scope="col">Email</th>
                   <th scope="col">Location</th>
                   <th scope="col"></th>
                 </tr>
@@ -89,10 +87,9 @@
                 {%for prof in professionals%}
                 <tr>
                   <td>{{prof.first_name}} {{prof.last_name}}</td>
-                  <td>no row yet</td>
-                  <td>{{prof.phone_number}}</td>
+                  <td>????</td>
                   <td>nada</td>
-                  <td><button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
+                  <td><button type="button" class="btn btn-outline-dark" data-bs-toggle="modal"
                       data-bs-target="#exampleModal{{ loop.index }}">
                       {{prof.town}}
                     </button>
@@ -118,7 +115,7 @@
                       </div>
                     </div>
                   </td>
-                  <td><a href="{{url_for('index')}}" class="btn btn-info" role="button">Book</a></td>
+                  <td><a href="/createReservation/{{prof.id}}" class="btn btn-primary" role="button">Book a Reservation</a></td>
                 </tr>
                 {%endfor%}
               </tbody>

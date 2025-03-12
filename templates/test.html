@@ -1,12 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Custom Multi-Select Dropdown</title>
-  
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Maps Embed</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
-  
+
+<div class="container mt-4">
+    <h2>Map Directions</h2>
+    <iframe id="mapFrame" width="600" height="450" style="border:0" loading="lazy" allowfullscreen
+            referrerpolicy="no-referrer-when-downgrade"
+            src="">
+    </iframe>
+</div>
+
+<!-- Modal for entering ZIP -->
+<div class="modal fade" id="zipModal" tabindex="-1" aria-labelledby="zipModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="zipModalLabel">Enter Your ZIP Code</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="zipInput" class="form-control" placeholder="Enter ZIP Code">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="saveZip">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        let userZip = "{{ user_zip if user_zip else '' }}"; // Get user ZIP from Flask
+        
+        function updateMap(zip) {
+            let destination = zip ? zip : "Enter a ZIP"; 
+            let mapSrc = `https://www.google.com/maps/embed/v1/directions?key=AIzaSyDmYpBjV12iq8-83OxZMK8aujT1AWxb8Sc&origin=07642&destination=${destination}`;
+            $("#mapFrame").attr("src", mapSrc);
+        }
+
+        if (!userZip) {
+            $("#zipModal").modal("show"); // Show the modal if no ZIP is found
+        } else {
+            updateMap(userZip);
+        }
+
+        $("#saveZip").click(function () {
+            let enteredZip = $("#zipInput").val().trim();
+            if (enteredZip) {
+                updateMap(enteredZip);
+                $("#zipModal").modal("hide");
+            }
+        });
+    });
+</script>
+
 </body>
 </html>
+
+
+
+
+{%extends "base.html"%}
+{%block title%}Connect with {{prof.fName}}{%endblock%}
+
+{%block content%}
+
+<section id="start">
+    <div class="container my-5 py-5">
+      <div class="row featurette py-lg-5 ">
+        <div class="col-md-5 order-md-1 d-flex">
+          <h1 class="text-capitalize  lh-1 mb-3">Connect with FNAME LNAME</h1>
+          <h3>They are from LOCATION, and have SPECIALITIES</h3>
+        </div>
+        <div class="col-md-7 order-md-2">
+          <div class="text-content ps-md-5 mt-4 mt-md-0">
+            <h4>Describe your project</h4>
+            <h6>What are you looking for? You can both describe your dream project with images and text</h6>
+            <p class="py-lg-2">Neque, vestibulum sed varius magna et at. Eu, adipiscing morbi augue justo. Nibh
+              laoreet volutpat quis velit. Blandit aliquam donec sed morbi congue eget lorem viverra porta id
+              lobortis.</p>
+            <a href="index.html" class="btn btn-primary btn-lg px-4 me-md-2">Get
+              Started</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {%endblock%}
