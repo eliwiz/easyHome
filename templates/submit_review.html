@@ -9,7 +9,7 @@
       <!-- Left side (1/3 width) -->
       <div class="col-md-4">
         <h1 class="text-capitalize lh-1 mb-3">Leave a Review For {{prof.first_name}} {{prof.last_name}}</h1>
-        <h3>They are from {{prof.town}}, and have specialize in:{{prof.profession}}</h3>
+        <h3>They are from {{prof.town}}. <br> Occupation: {%for profession in prof.profession.split(",")%}{{profession}}{%endfor%}</h3>
       </div>
       
       <!-- Right side (2/3 width) -->
