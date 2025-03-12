@@ -20,8 +20,6 @@ from flask_login import LoginManager, UserMixin
 from flask_login import login_user, current_user, logout_user, login_required
 from functools import wraps
 import sqlite3
-# from flask_sqlalchemy import SQLAlchemy
-# from sqlalchemy import desc, asc, LargeBinary
 
 from database import init_db
 con = sqlite3.connect("database.db")
@@ -42,9 +40,14 @@ class User(UserMixin):
             self.first_name = user_row["first_name"]
             self.middle_name = user_row["middle_name"]
             self.last_name = user_row["last_name"]
+            self.gender = user_row["gender"]
             self.phone_number = user_row["phone_number"]
             self.email = user_row["email"]
             self.password = user_row["password"]  
+            self.street_name = user_row["street_name"]
+            self.town = user_row["town"]
+            self.state = user_row["state"]
+            self.zip_code = user_row["zip_code"]
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -170,40 +173,35 @@ def registerProf():
         town = request.form.get("town")
         state = request.form.get("state")
         zip = request.form.get("zip")
+        expertise = request.form.getlist("expertise[]")
+
+        professions = ",".join(expertise)
 
         if password != password2:
             flash("Please make sure that your passwords match!", "warning")
-            return redirect(url_for("login"))
-        if add_cust(fname, mname, lname, gender, phone, email, password, apt, street, town, state, zip):
-            flash("User registered successfully!", "success")
-            return redirect(url_for("index"))
-        else:
-            flash("An error occurred while registering the user.", "danger")
-            
+            return redirect(url_for("registerProf"))
+        
         conn = sqlite3.connect('database.db')
         c = conn.cursor()
-
         c.execute("SELECT * FROM users WHERE email = ?", (email,))
         if c.fetchone() is not None:
-            flash("Email already registered!","warning")
+            conn.close()
+            flash("Email already registered!", "warning")
             return render_template("registerProf.html")
-        
-        c.execute("""
-                INSERT INTO users (
-                first_name, middle_name, last_name, gender, phone_number, email, password, street_number, street_name, town, state, zip_code, user_type)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) """,(fname,mname,lname,gender,phone,email,password,street_number,street_name,town,state,zip_code,"professional"))
-    
-        conn.commit()
-        flash("Registration successful! Please login.", "success")
-        
-        return redirect(url_for("login"))
+        conn.close()
 
+        if add_prof(fname, mname, lname, gender, phone, email, password, apt, street, town, state, zip, professions):
+            flash("User registered successfully!", "success")
+            return redirect(url_for("login"))
+        else:
+            flash("An error occurred while registering the user.", "danger")
+        
     return render_template("registerProf.html")
 
 #Professional pages (viewing as customer)
 @app.route('/professionals', methods=["GET", "POST"])
 def professionals():
-    list = get_all_users()
+    list = get_professionals()
     user_zip = ""
     if current_user.is_authenticated:
         user_zip = get_user_by_id(current_user.id).zip_code
@@ -325,7 +323,7 @@ def get_professionals():
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
         
-        c.execute("SELECT * FROM professionals")
+        c.execute("SELECT * FROM users WHERE user_type='professional'")
         professionals = [dict(row) for row in c.fetchall()]
 
         return professionals
@@ -451,7 +449,6 @@ def add_cust(first_name, middle_name, last_name, gender, phone_number, email, pa
               street_number, street_name, town, state, zip_code))
 
         conn.commit()
-        print("User added successfully")
         return True  
     except sqlite3.Error as e:
         print(f"Error adding user: {e}")
@@ -461,18 +458,26 @@ def add_cust(first_name, middle_name, last_name, gender, phone_number, email, pa
             conn.close()
 
 
-def add_prof(first_name, middle_name, last_name, gender, phone_number, email, password):
+def add_prof(first_name, middle_name, last_name, gender, phone_number, email, password, street_number, street_name, town, state, zip_code, professions):
     try:
         conn = sqlite3.connect('database.db')
         c = conn.cursor()
 
         c.execute("""
-            INSERT INTO users (first_name, middle_name, last_name, gender, phone_number, email, password)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, (first_name, middle_name, last_name, gender, phone_number, email, password))
+            INSERT INTO users (first_name, middle_name, last_name, gender, phone_number, email, password, street_number, street_name, town, state, zip_code, user_type)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (first_name, middle_name, last_name, gender, phone_number, email, password, 
+              street_number, street_name, town, state, zip_code, "professional"))
+        
+        user_id = c.lastrowid
+        c.execute("""
+            INSERT INTO professionals (user_id, profession, hourly_cost, description)
+            VALUES (?, ?, ?, ?)
+        """, (user_id, professions, 10.00, "this is a test"))
 
         conn.commit()
-        print("User added successfully")
+
+        print(f"Professional added successfully with ID {user_id}")
         return True  
     except sqlite3.Error as e:
         print(f"Error adding user: {e}")
