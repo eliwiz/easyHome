@@ -6,7 +6,7 @@
   <div class="row">
     <div class="col-6">
       <h2>Create a Professional Account</h2> <hr>
-      <form method="post">
+      <form method="POST">
         <!-- Email input -->
         <div class="row">
           <h4>Basic Information (Required)</h4>
@@ -56,7 +56,8 @@
         <div class="row">
           <div class="col d-flex gap-1">
             <div data-mdb-input-init class="form-outline mb-3 w-50">
-              <input type="tel" id="form2Example1" class="form-control" name="phone" required maxlength="50"/>
+              <input type="tel" id="form2Example1" class="form-control" name="phone" required maxlength="50"
+                 />
               <label class="form-label" for="form2Example1">Phone Number (Format: 1234567890)</label>
             </div>
             <div class="form-outline mb-3 dropdown w-50" data-mdb-input-init>
@@ -69,52 +70,98 @@
             </div>
           </div>
         </div>
-        <hr>
-        <!-- Professional Info -->
+
+        <!-- ADDRESS -->
+        <h4>Professional Address (Recommended)</h4>
+        <div class="row">
+            <div data-mdb-input-init class="form-outline mb-3 w-100">
+              <input type="text" id="form2Example1" class="form-control" name="street/atp" maxlength="10" />
+              <label class="form-label" for="form2Example1">Street/Apartment #</label>
+            </div>
+          </div>
+          <div class="row">
+            <div data-mdb-input-init class="form-outline mb-3 w-100">
+              <input type="text" id="form2Example1" class="form-control" name="street" maxlength="35" />
+              <label class="form-label" for="form2Example1">Street Address</label>
+            </div>
+          </div>
+        <div class="row">
+          <div class="col d-flex gap-1">
+            <div data-mdb-input-init class="form-outline mb-3 w-33">
+              <input type="text" id="form2Example1" class="form-control" name="town" maxlength="30" />
+              <label class="form-label" for="form2Example1">Town/City</label>
+            </div>
+            <div data-mdb-input-init class="form-outline mb-3 w-33">
+              <input type="text" id="form2Example1" class="form-control" name="state" maxlength="2" />
+              <label class="form-label" for="form2Example1">State (abbreviated)</label>
+            </div>
+            <div data-mdb-input-init class="form-outline mb-3 w-33">
+              <input type="text" id="form2Example1" class="form-control" name="zip" maxlength="5" />
+              <label class="form-label" for="form2Example1">Zip Code</label>
+            </div>
+          </div>
+        </div>
+
         <h4>Professional Information</h4>
         <div class="row">
           <h5>Expertise(s)</h5>
             <div>
               <div class="row">
                 <div class="col-4">
-                  <input type="checkbox" id="Foundation" value="Foundation">
-                  <label for="Foundation">Foundation</label><br>
+                    <input type="radio" id="Foundation" name="service" value="Foundation">
+                    <label for="Foundation">Foundation</label><br>
                 </div>
                 <div class="col-4">
-                  <input type="checkbox" id="Priming" value="Priming">
-                  <label for="Priming">Priming</label><br>
+                    <input type="radio" id="Priming" name="service" value="Priming">
+                    <label for="Priming">Priming</label><br>
                 </div>
                 <div class="col-4">
-                  <input type="checkbox" id="Roof" value="Roof">
-                  <label for="Roof">Roof</label><br>
+                    <input type="radio" id="Roof" name="service" value="Roof">
+                    <label for="Roof">Roof</label><br>
                 </div>
               </div>
               <div class="row">
                 <div class="col-4">
-                  <input type="checkbox" id="Plumbing" value="Plumbing">
-                  <label for="Plumbing">Plumbing</label><br>
+                    <input type="radio" id="Plumbing" name="service" value="Plumbing">
+                    <label for="Plumbing">Plumbing</label><br>
                 </div>
                 <div class="col-4">
-                  <input type="checkbox" id="Electrician" value="Electrician">
-                  <label for="Electrician">Electrician</label><br>
+                    <input type="radio" id="Electrician" name="service" value="Electrician">
+                    <label for="Electrician">Electrician</label><br>
                 </div>
                 <div class="col-4">
-                  <input type="checkbox" id="Gutter" value="Gutter">
-                  <label for="Gutter">Gutter</label><br>
+                    <input type="radio" id="Gutter" name="service" value="Gutter">
+                    <label for="Gutter">Gutter</label><br>
                 </div>
-              </div>
-              <div class="row">
-                <div class="col-6">
-                  <input type="checkbox" id="Siding" value="Siding">
-                  <label for="Siding">Siding</label><br>
-                </div>
-                <div class="col-6"> 
-                  <input type="checkbox" id="Cooling" value="Cooling">
-                  <label for="Cooling">Cooling</label><br>
-                </div>
-              </div>
             </div>
+            <div class="row">
+                <div class="col-6">
+                    <input type="radio" id="Siding" name="service" value="Siding">
+                    <label for="Siding">Siding</label><br>
+                </div>
+                <div class="col-6">
+                    <input type="radio" id="Cooling" name="service" value="Cooling">
+                    <label for="Cooling">Cooling</label><br>
+                </div>
+            </div>
+          </div>
         </div>
+        <div class="row">
+          <br>
+          <h5>More Information</h5>
+          <div data-mdb-input-init class="form-outline mb-3 w-100">
+            <input type="number" id="form2Example1" class="form-control" name="hourly" maxlength="12" />
+            <label class="form-label" for="form2Example1">Hourly Rate</label>
+          </div>
+          <div data-mdb-input-init class="form-outline mb-3 w-100">
+            <input type="text" id="form2Example1" class="form-control" name="desc" />
+            <label class="form-label" for="form2Example1">Description</label>
+          </div>
+        </div>
+        
+
+
+
 
         <!-- Submit button -->
         <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-block mb-3">Create Account</button>

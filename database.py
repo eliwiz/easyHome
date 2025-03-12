@@ -51,7 +51,6 @@ def init_db():
         c.execute("""
             CREATE TABLE IF NOT EXISTS workDetails (
                   id iNTEGER PRIMARY KEY AUTOINCREMENT,
-                  work_id NUMBER(15),
                   work_name VARCHAR2(50),
                   work_description VARCHAR2(100),
                   FOREIGN KEY (user_id) REFERENCES users(id),
@@ -71,17 +70,20 @@ def init_db():
 
 def reset_db():
     try: 
-        conn = sqlite3.connect("users.db")
+        conn = sqlite3.connect("database.db")  # Ensure it matches `init_db()`
         cursor = conn.cursor()
 
-        cursor.execute('DROP TABLE IF EXISTS users')
+        # Drop all tables
+        cursor.execute("DROP TABLE IF EXISTS users")
+        cursor.execute("DROP TABLE IF EXISTS professionals")
+        cursor.execute("DROP TABLE IF EXISTS reviews")
+        cursor.execute("DROP TABLE IF EXISTS workDetails")
 
         conn.commit()
-        print("Database reset successfully")
+        print("All tables have been reset successfully")
 
     except sqlite3.Error as e:
         print(f"Database reset error: {e}")
 
     finally:
-        if conn:
-            conn.close()
+        conn.close()

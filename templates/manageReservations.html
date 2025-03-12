@@ -1,5 +1,52 @@
 {%extends "base.html"%}
-{%block title%}MANAGE BOOKINGS USER SIDE{%endblock%}
+{%block title%}Manage Your Reservations{%endblock%}
 
 {%block content%}
+
+<div class="row">
+    <h2>Manage your Reservations</h2>
+    <table class="table table-striped table-light">
+      <thead>
+        <tr>
+          <th scope="col">Professional's Name</th>
+          <th scope="col">Project Title</th>
+          <th scope="col">Project Description</th>
+          <th scope="col">Options</th>
+\        </tr>
+      </thead>
+      <tbody>
+        {%for reserve in reservations%}
+        <tr>
+            <td> PROFESSIONAL NAME</td>
+            <td>{{reserve.work_name}}</td>
+            <td>{{reserve.work_description}}</td>
+            <td>
+                <button type="button" class="btn btn-outline-dark" data-bs-toggle="modal"
+                data-bs-target="#exampleModal{{ loop.index }}">
+                Write a Review
+              </button>
+              <button type="button" class="btn btn-outline-danger">
+                Cancel Reservation
+              </button>
+              
+              <div class="modal fade" id="exampleModal{{ loop.index }}" tabindex="-1"
+              aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">{{ prof.name }}</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            </td>
+        </tr>
+
 {%endblock%}
