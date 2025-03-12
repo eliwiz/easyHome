@@ -280,6 +280,75 @@ def manageJobs():
 def editProf():
     return render_template("editProf.html")
 
+@app.route('/submit_review/<professional_id>', methods=["GET", "POST"])
+@login_required
+def submit_review(professional_id):
+    if request.method == "POST":
+        rating = request.form.get("rating")
+        comment = request.form.get("comment")
+        
+        # Validate the rating
+        try:
+            rating = int(rating)
+            if rating < 1 or rating > 5:
+                flash("Rating must be between 1 and 5", "danger")
+                return redirect(request.url)
+        except ValueError:
+            flash("Invalid rating value", "danger")
+            return redirect(request.url)
+        
+        # Get the professional's user_id
+        professional = get_professional_by_id(professional_id)
+        if not professional:
+            flash("Professional not found", "danger")
+            return redirect(url_for('professionals'))
+        
+        # Add the review
+        if add_review(current_user.id, professional_id, rating, comment):
+            flash("Review submitted successfully", "success")
+            return redirect(url_for('professionals'))
+        else:
+            flash("Failed to submit review", "danger")
+            return redirect(request.url)
+    
+    # GET request - show the form
+    professional = get_professional_by_id(professional_id)
+    if not professional:
+        flash("Professional not found", "danger")
+        return redirect(url_for('professionals'))
+    
+    return render_template("submit_review.html", prof=professional)
+
+@app.route('/reviews/<professional_id>')
+def view_reviews(professional_id):
+    try:
+        professional = get_professional_by_id(professional_id)
+        if not professional:
+            flash("Professional not found", "danger")
+            return redirect(url_for('professionals'))
+            
+        conn = sqlite3.connect('database.db')
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+        
+        c.execute("""
+            SELECT r.*, u.first_name, u.last_name
+            FROM reviews r
+            JOIN users u ON r.customer_id = u.id
+            WHERE r.professional_id = ?
+            ORDER BY r.id DESC
+        """, (professional_id,))
+        
+        reviews = [dict(row) for row in c.fetchall()]
+        return render_template('reviews.html', professional=professional, reviews=reviews)
+    except sqlite3.Error as e:
+        print(f"Error retrieving reviews: {e}")
+        flash("An error occurred while retrieving reviews", "danger")
+        return redirect(url_for('professionals'))
+    finally:
+        if conn:
+            conn.close()
+
 #Unimportant pages, likely to get cut at end
 @app.route('/full', methods=["GET", "POST"])
 def indexfull():
@@ -290,6 +359,48 @@ def test():
     return render_template("test.html")
 
 #FUNCTIONS
+def get_professional_by_id(professional_id):
+    try:
+        conn = sqlite3.connect('database.db')
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+        
+        c.execute("""
+            SELECT professionals.*, users.first_name, users.last_name
+            FROM professionals
+            JOIN users ON professionals.user_id = users.id
+            WHERE professionals.id = ?
+        """, (professional_id,))
+        
+        row = c.fetchone()
+        return dict(row) if row else None
+    except sqlite3.Error as e:
+        print(f"Error retrieving professional: {e}")
+        return None
+    finally:
+        if conn:
+            conn.close()
+
+def get_professional_rating(professional_id):
+    try:
+        conn = sqlite3.connect('database.db')
+        c = conn.cursor()
+        
+        c.execute("""
+            SELECT AVG(rating) as avg_rating 
+            FROM reviews 
+            WHERE professional_id = ?
+        """, (professional_id,))
+        
+        result = c.fetchone()
+        return round(result[0], 1) if result[0] is not None else "No ratings"
+    except sqlite3.Error as e:
+        print(f"Error getting rating: {e}")
+        return "Error"
+    finally:
+        if conn:
+            conn.close()
+
 def check_columns():
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
@@ -323,17 +434,39 @@ def get_professionals():
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
         
-        c.execute("SELECT * FROM users WHERE user_type='professional'")
+        # Get professionals with their details
+        c.execute("""
+            SELECT u.id as user_id, u.first_name, u.last_name, u.town, u.zip_code, 
+                   p.id as prof_id, p.profession, p.hourly_cost, p.description
+            FROM users u
+            JOIN professionals p ON u.id = p.user_id
+            WHERE u.user_type = 'professional'
+        """)
         professionals = [dict(row) for row in c.fetchall()]
-
+        
+        # Add ratings for each professional
+        for prof in professionals:
+            c.execute("""
+                SELECT AVG(rating) as avg_rating, COUNT(id) as review_count
+                FROM reviews
+                WHERE professional_id = ?
+            """, (prof['prof_id'],))
+            
+            rating_data = c.fetchone()
+            if rating_data:
+                prof['avg_rating'] = round(rating_data['avg_rating'], 1) if rating_data['avg_rating'] else 0
+                prof['review_count'] = rating_data['review_count']
+            else:
+                prof['avg_rating'] = 0
+                prof['review_count'] = 0
+                
         return professionals
     except sqlite3.Error as e:
-        print(f"Error retrieving users: {e}")
+        print(f"Error retrieving professionals: {e}")
         return []
     finally:
         if conn:
             conn.close()
-
             
 def get_user_by_id(user_id):
     try:
