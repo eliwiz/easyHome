@@ -428,7 +428,7 @@ def get_professional_by_id(professional_id):
         c = conn.cursor()
         
         c.execute("""
-            SELECT professionals.*, users.first_name, users.last_name
+            SELECT professionals.*, users.*
             FROM professionals
             JOIN users ON professionals.user_id = users.id
             WHERE professionals.id = ?
