@@ -24,9 +24,6 @@ from database import init_db, reset_db
 con = sqlite3.connect("database.db")
 con.row_factory = sqlite3.Row
 
-# reset_db()  # Resets the database
-# init_db()   # Reinitializes the tables
-
 conn = sqlite3.connect('database.db')
 # reset_db()
 # init_db()
@@ -283,18 +280,21 @@ def createReservation(profId):
         professional = get_user_by_id(profId)
         return render_template("createReservation.html", prof=professional)
     if request.method == "POST":
+        print("HELLO")
         prof_id = request.form.get("profID")
         title = request.form.get("title")
         description = request.form.get("desc")
 
         if add_work_detail(current_user.id, prof_id, title, description):
-            msg = Message("You got a new Reservation!", recipients=[get_user_by_id(profId).email])
-            msg.body = f"You just had a reservation booked by {get_user_by_id(current_user.id).first_name} {get_user_by_id(current_user.id).last_name}. \nThe project name is {title}, and it's decription is {description}. \n Log in to check it out and discuss with the potential client!"
-            mail.send(msg)
+            # msg = Message("You got a new Reservation!", recipients=[get_user_by_id(profId).email])
+            # msg.body = f"You just had a reservation booked by {get_user_by_id(current_user.id).first_name} {get_user_by_id(current_user.id).last_name}. \nThe project name is {title}, and it's decription is {description}. \n Log in to check it out and discuss with the potential client!"
+            # mail.send(msg)
             print("IT WORKED???")
             flash("Professional created sucessfully!", "success")
-            return url_for("manageReservations")
-    return url_for("index")
+            return redirect(url_for("manageReservations"))
+        else:
+            flash("Error creating reservation", "danger")
+        return url_for("professionals")
 
 #Customer onlt pages (checking things they booked, updating info)
 @app.route("/editUser", methods=["POST", "GET"])
@@ -329,18 +329,9 @@ def editCustomer():
 @login_required
 def manageReservations():
     reserved = get_work_details_by_user(current_user.id)
+    print(reserved)
     return render_template("manageReservations.html", reservations = reserved)
 
-#Professional only pages (checking their appointments, updating info)
-@app.route("/manageJobs", methods=['GET', "POST"])
-@login_required
-def manageJobs():
-    return render_template("manageJobs.html")
-
-@app.route("/editProfessional", methods=['GET', "POST"])
-@login_required
-def editProf():
-    return render_template("editProf.html")
 
 @app.route('/submit_review/<professional_id>', methods=["GET", "POST"])
 @login_required
@@ -411,6 +402,18 @@ def view_reviews(professional_id):
         if conn:
             conn.close()
 
+@app.route('/cancel_reservation', methods=['POST'])
+def cancel_reservation():
+    reservation_id = request.form.get('reservation_id')  # Get the parameter
+    if reservation_id != None:
+        if delete_work_detail(reservation_id):
+            flash("Sucessfully cancelled reservation", "success")
+        else:
+            flash("There was an error trying to delete the reservation", "danger")
+        return redirect(url_for('manageReservations')) 
+    flash("Need user parameter, please cancel in your 'Manage Reservations' page", "warning") 
+    return render_template("index.html")
+
 #Unimportant pages, likely to get cut at end
 @app.route('/full', methods=["GET", "POST"])
 def indexfull():
@@ -462,15 +465,6 @@ def get_professional_rating(professional_id):
     finally:
         if conn:
             conn.close()
-
-def check_columns():
-    conn = sqlite3.connect('database.db')
-    c = conn.cursor()
-    c.execute("PRAGMA table_info(users)")
-    columns = c.fetchall()
-    for col in columns:
-        print(col)
-    conn.close()
 
 def get_all_users():
     try:
@@ -583,8 +577,7 @@ def get_users_by_zip(zip_code):
     finally:
         if conn:
             conn.close()
-
-            
+          
 def get_users_by_name(name):
     try:
         conn = sqlite3.connect('database.db')
@@ -628,7 +621,7 @@ def get_users_by_zip_range(lower, upper):
     finally:
         if conn:
             conn.close()
-
+            
 def get_work_details_by_user(user_id):
     try:
         conn = sqlite3.connect("database.db")
@@ -636,20 +629,26 @@ def get_work_details_by_user(user_id):
         c = conn.cursor()
 
         c.execute("""
-            SELECT * FROM workDetails
-            WHERE user_id = ?
+            SELECT wd.id AS work_id, wd.work_name, wd.work_description,
+                   wd.professional_id, 
+                   p.id AS professional_primary_key, 
+                   u.first_name, u.last_name, u.email, u.phone_number
+            FROM workDetails wd
+            JOIN users u ON wd.professional_id = u.id  
+            LEFT JOIN professionals p ON wd.professional_id = p.user_id 
+            WHERE wd.user_id = ?
         """, (user_id,))
 
-        work_rows = c.fetchall()  
-        return [dict(row) for row in work_rows]  
-
+        work_rows = c.fetchall()  # Fetch the data BEFORE closing the connection
+        return work_rows
+    
     except sqlite3.Error as e:
-        print(f"Error retrieving work details: {e}")
-        return []
+        print(f"Error fetching work details: {e}")
+        return None
     
     finally:
         if conn:
-            conn.close()
+            conn.close()  
 
 def add_acc(first_name, middle_name, last_name, gender, phone_number, email, password, 
              street_number, street_name, town, state, zip_code, user_type):
@@ -673,15 +672,15 @@ def add_acc(first_name, middle_name, last_name, gender, phone_number, email, pas
         if conn:
             conn.close()
 
-def add_work_detail(user_id, professional_id, work_id, work_name, work_description):
+def add_work_detail(user_id, professional_id, work_name, work_description):
     try:
         conn = sqlite3.connect('database.db')
         c = conn.cursor()
 
         c.execute("""
-            INSERT INTO workDetails (user_id, professional_id, work_name, work_description)
-            VALUES (?, ?, ?, ?, ?)
-        """, (user_id, professional_id, work_name, work_description))
+            INSERT INTO workDetails (work_name, work_description, user_id, professional_id)
+            VALUES (?, ?, ?, ?)
+        """, (work_name, work_description, user_id, professional_id))
 
         conn.commit()
         print("Work detail added successfully")
@@ -772,8 +771,7 @@ def edit_user(user_id, first_name, middle_name, last_name, gender, phone_number,
     finally:
         if conn:
             conn.close()
-            
-            
+                       
 def add_review(customer_id, professional_id, rating, comment):
     try:
         conn = sqlite3.connect('database.db')
@@ -794,6 +792,26 @@ def add_review(customer_id, professional_id, rating, comment):
         if conn:
             conn.close()
             
+def delete_work_detail(work_id):
+    try:
+        conn = sqlite3.connect('database.db')
+        c = conn.cursor()
+
+        c.execute("DELETE FROM workDetails WHERE id = ?", (work_id,))
+        conn.commit()
+
+        if c.rowcount > 0:
+            print(f"Record with ID {work_id} deleted successfully")
+            return True
+        else:
+            print(f"No record found with ID {work_id}")
+            return False
+    except sqlite3.Error as e:
+        print(f"Error deleting record: {e}")
+        return False
+    finally:
+        if conn:
+            conn.close()
 
 if __name__ == "__main__":
     app.secret_key = "jfvdjhklvdfhgspierytuepsri5uw43hkjlh" 

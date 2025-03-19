@@ -7,17 +7,15 @@
 <section id="start">
   <div class="container my-5 py-5">
     <div class="row featurette py-lg-5 align-items-center">
-      <!-- Left side (1/3 width) -->
       <div class="col-md-4">
         <h1 class="text-capitalize lh-1 mb-3">Connect with {{prof.first_name}} {{prof.last_name}}</h1>
-        <h3>They are from {{prof.town}}, and have specialize in:</h3>
+        <h3>They are from {{prof.town}}, and have specialize in {{prof.profession}}</h3>
+        <h5>{{prof.description}}</h5>
       </div>
-      
-      <!-- Right side (2/3 width) -->
-       
+             
       <div class="col-md-8">
-        <form action="POST">
-        <div class="text-content ps-md-5">
+        <form action="/createReservation/{{prof.id}}" method="POST">
+          <div class="text-content ps-md-5">
           <h4>Enter your project</h4>
           <input type="hidden" id="profID" name="profID" value="{{prof.id}}">
           <div data-mdb-input-init class="form-outline mb-3 w-33">
@@ -25,11 +23,11 @@
               <label class="form-label" for="form2Example1">Project Title</label>
             </div>
             <div data-mdb-input-init class="form-outline mb-3 w-33">
-              <textarea id="form2Example1" class="form-control" name="description" rows="5" maxlength="500"></textarea>
+              <textarea id="form2Example1" class="form-control" name="desc" rows="5" maxlength="500"></textarea>
               <label class="form-label" for="form2Example1">Project Description</label>
             </div>
-          <a href="/manageReservations" class="btn btn-primary btn-lg px-4 me-md-2">Submit Project Proposal</a>
-        </div>
+            <button type="submit" class="btn btn-primary btn-lg px-4 me-md-2">Submit Project Proposal</button>
+          </div>
       </form>
       </div>
     </div>

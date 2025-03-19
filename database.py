@@ -48,17 +48,18 @@ def init_db():
             )
         """)
 
-        # copy work address from users
         c.execute("""
-            CREATE TABLE IF NOT EXISTS workDetails (
-                  id iNTEGER PRIMARY KEY AUTOINCREMENT,
-                  work_name VARCHAR2(50),
-                  work_description VARCHAR2(100),
-                  FOREIGN KEY (user_id) REFERENCES users(id),
-                  FOREIGN KEY (professional_id) REFERENCES professionals(id)
-            )      
-        """)
-
+             CREATE TABLE IF NOT EXISTS workDetails (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                work_name VARCHAR2(50),
+                work_description VARCHAR2(100),
+                user_id INTEGER NOT NULL,
+                professional_id INTEGER NOT NULL,
+                FOREIGN KEY (user_id) REFERENCES users(id),
+                FOREIGN KEY (professional_id) REFERENCES professionals(id)
+              )
+            """)
+        
         conn.commit()
         print("Database initialization successful")
     
@@ -71,10 +72,9 @@ def init_db():
 
 def reset_db():
     try: 
-        conn = sqlite3.connect("database.db")  # Ensure it matches `init_db()`
+        conn = sqlite3.connect("database.db")  
         cursor = conn.cursor()
 
-        # Drop all tables
         cursor.execute("DROP TABLE IF EXISTS users")
         cursor.execute("DROP TABLE IF EXISTS professionals")
         cursor.execute("DROP TABLE IF EXISTS reviews")
