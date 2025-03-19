@@ -28,6 +28,9 @@ con.row_factory = sqlite3.Row
 # init_db()   # Reinitializes the tables
 
 conn = sqlite3.connect('database.db')
+# reset_db()
+# init_db()
+
 c = conn.cursor()
 
 c.execute("SELECT name FROM sqlite_master WHERE type='table';")
@@ -43,6 +46,16 @@ login_manager.login_view = 'login'
 # Login required messages
 login_manager.login_message = "Unauthorized Access! Please log in!"
 login_manager.login_message_category = "danger"
+
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USERNAME'] = 'easyhomefdunoreply@gmail.com'
+app.config['MAIL_PASSWORD'] = '2nB*/&s8Uu32ZX./'  
+app.config['MAIL_DEFAULT_SENDER'] = 'easyhomefdunoreply@gmail.com'
+app.config['MAIL_DEBUG'] = True
+mail = Mail(app)
 
 #SQL3 databases do not work with UserMixin, *should* create temporary object in order for UserMixin to work properly
 class User(UserMixin):
@@ -108,13 +121,13 @@ def logout():
     flash("Logged out successfully", "success")
     return redirect(url_for("index"))
 
-@app.route("/admin", methods=["GET", "POST"])
-def admin():
-    list = get_all_users()
-    if request.method == "POST":
-        user_id = "delete_cart_item"
-        delete_user(user_id)
-    return render_template("admin.html", users=list)
+# @app.route("/admin", methods=["GET", "POST"])
+# def admin():
+#     list = get_all_users()
+#     if request.method == "POST":
+#         user_id = "delete_cart_item"
+#         delete_user(user_id)
+#     return render_template("admin.html", users=list)
 
 #REGISTER PAGES
 @app.route('/register', methods=["GET", "POST"])
@@ -129,7 +142,6 @@ def registerCust():
         mname = request.form.get("mname")
         lname = request.form.get("lname")
         email = request.form.get("email")
-        user = request.form.get("user")
         password = request.form.get("password")
         password2 = request.form.get("password2")
         phone = request.form.get("phone")
@@ -205,7 +217,7 @@ def registerProf():
             return render_template("registerProf.html")
         conn.close()
 
-        if add_prof(fname, mname, lname, gender, phone, email, password, apt, street, town, state, zip, expertise, hourly, desc):
+        if add_prof(fname, mname, lname, gender, phone, email, password, apt, street, town, state, zip, professions, hourly, desc):
             flash("User registered successfully!", "success")
             return redirect(url_for("login"))
         else:
@@ -276,17 +288,42 @@ def createReservation(profId):
         description = request.form.get("desc")
 
         if add_work_detail(current_user.id, prof_id, title, description):
+            msg = Message("You got a new Reservation!", recipients=[get_user_by_id(profId).email])
+            msg.body = f"You just had a reservation booked by {get_user_by_id(current_user.id).first_name} {get_user_by_id(current_user.id).last_name}. \nThe project name is {title}, and it's decription is {description}. \n Log in to check it out and discuss with the potential client!"
+            mail.send(msg)
             print("IT WORKED???")
             flash("Professional created sucessfully!", "success")
             return url_for("manageReservations")
     return url_for("index")
 
 #Customer onlt pages (checking things they booked, updating info)
-@app.route("/editCustomer", methods=["POST", "GET"])
+@app.route("/editUser", methods=["POST", "GET"])
 @login_required
 def editCustomer():
     userInformation = get_user_by_id(current_user.id)
-    return render_template("editCust.html", userInfo= userInformation)
+    if request.method == "POST":
+        if "general" in request.form:
+            fname = request.form.get("fname")
+            fname = request.form.get("fname")
+            mname = request.form.get("mname")
+            lname = request.form.get("lname")
+            email = request.form.get("email")
+            password = request.form.get("password")
+            phone = request.form.get("phone")
+            gender = request.form.get("gender")      
+            apt = request.form.get("street/atp")
+            street = request.form.get("street")
+            town = request.form.get("town")
+            state = request.form.get("state")
+            zip = request.form.get("zip")
+            if edit_user(current_user.id, fname, mname, lname, gender, phone, email, password, apt, street, town, state, zip):   
+                flash("Sucessfully updated user details!", "success") 
+                userInformation = get_user_by_id(current_user.id)
+            else:
+                flash("Error updating user details", "danger")
+        if "work" in request.form:
+            pass
+    return render_template("editUser.html", userInfo= userInformation)
 
 @app.route("/manageReservations")
 @login_required
@@ -592,7 +629,6 @@ def get_users_by_zip_range(lower, upper):
         if conn:
             conn.close()
 
-
 def get_work_details_by_user(user_id):
     try:
         conn = sqlite3.connect("database.db")
@@ -673,7 +709,7 @@ def add_prof(first_name, middle_name, last_name, gender, phone_number, email, pa
         c.execute("""
             INSERT INTO professionals (user_id, profession, hourly_cost, description)
             VALUES (?, ?, ?, ?)
-        """, (user_id, "Plumber", 10.00, "this is a test"))
+        """, (user_id, professions, 10.00, "this is a test"))
 
         conn.commit()
 
@@ -707,7 +743,7 @@ def delete_user(user_id):
         if conn:
             conn.close()
 
-def edit_user(user_id, first_name, middle_name, last_name, gender, phone_number, email, password):
+def edit_user(user_id, first_name, middle_name, last_name, gender, phone_number, email, password, street_number, street_name, town, state, zip_code):    
     try:
         conn = sqlite3.connect('database.db')
         c = conn.cursor()
@@ -715,9 +751,12 @@ def edit_user(user_id, first_name, middle_name, last_name, gender, phone_number,
         c.execute("""
             UPDATE users 
             SET first_name = ?, middle_name = ?, last_name = ?, gender = ?, 
-                phone_number = ?, email = ?, password = ?
+                phone_number = ?, email = ?, password = ?, 
+                street_number = ?, street_name = ?, town = ?, state = ?, 
+                zip_code = ?
             WHERE id = ?
-        """, (first_name, middle_name, last_name, gender, phone_number, email, password, user_id))
+        """, (first_name, middle_name, last_name, gender, phone_number, email, password, 
+              street_number, street_name, town, state, zip_code, user_id))
 
         conn.commit()
 

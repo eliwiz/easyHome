@@ -1,0 +1,7 @@
+Hello! Welcome to EasyHome's code. 
+
+
+The program will send an email to the "professional" account that is booked when an appointment is made
+Email information, feel free to log in if needed:
+Email: easyhomefdunoreply@gmail.com
+Password: 2nB*/&s8Uu32ZX./

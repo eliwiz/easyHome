@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block title %}Edit Your Account{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <!-- Left Column -->
+    <div class="col-md-6">
+      <h2>Edit Account</h2>
+      <hr>
+      <form method="post">
+        <!-- Basic Information -->
+        <div class="row">
+          <h4>Basic Information (Required)</h4>
+          <div class="row">
+            <div class="col-md-6">
+              <div data-mdb-input-init class="form-outline mb-3">
+                <input type="text" id="fname" class="form-control" name="fname" required maxlength="25" value="{{ userInfo.first_name }}"/>
+                <label class="form-label" for="fname">Enter your First Name</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div data-mdb-input-init class="form-outline mb-3">
+                <input type="text" id="mname" class="form-control" name="mname" maxlength="15" value="{{ userInfo.middle_name }}"/>
+                <label class="form-label" for="mname">Enter your Middle Name</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-12">
+            <div data-mdb-input-init class="form-outline mb-3">
+              <input type="text" id="lname" class="form-control" name="lname" required maxlength="25" value="{{ userInfo.last_name }}"/>
+              <label class="form-label" for="lname">Enter your Last Name</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-12">
+            <div data-mdb-input-init class="form-outline mb-3">
+              <input type="email" id="email" class="form-control" name="email" required maxlength="50" value="{{ userInfo.email }}"/>
+              <label class="form-label" for="email">Email address</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-12">
+            <div data-mdb-input-init class="form-outline mb-3">
+              <input type="password" id="password" class="form-control" name="password" value="{{ userInfo.password }}"/>
+              <label class="form-label" for="password">Password</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div data-mdb-input-init class="form-outline mb-3">
+              <input type="tel" id="phone" class="form-control" name="phone" required maxlength="50" value="{{ userInfo.phone_number }}"/>
+              <label class="form-label" for="phone">Phone Number (Format: 123-456-7890)</label>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-outline mb-3">
+              <select name="gender" id="gender" class="form-select">
+                <option value="M">Male</option>
+                <option value="F">Female</option>
+                <option value="O">Other/Prefer not to Say</option>
+              </select>
+              <label class="form-label" for="gender">Choose your Gender</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Home Address -->
+        <h4>Home Address (Recommended)</h4>
+        <div class="row">
+          <div class="col-12">
+            <div data-mdb-input-init class="form-outline mb-3">
+              <input type="text" id="street_atp" class="form-control" name="street/atp" maxlength="10" value="{{ userInfo.street_number }}"/>
+              <label class="form-label" for="street_atp">Street/Apartment #</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-12">
+            <div data-mdb-input-init class="form-outline mb-3">
+              <input type="text" id="street" class="form-control" name="street" maxlength="35" value="{{ userInfo.street_name }}"/>
+              <label class="form-label" for="street">Street Address</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4">
+            <div data-mdb-input-init class="form-outline mb-3">
+              <input type="text" id="town" class="form-control" name="town" maxlength="30" value="{{ userInfo.town }}"/>
+              <label class="form-label" for="town">Town/City</label>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div data-mdb-input-init class="form-outline mb-3">
+              <input type="text" id="state" class="form-control" name="state" maxlength="2" value="{{ userInfo.state }}"/>
+              <label class="form-label" for="state">State (abbreviated)</label>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div data-mdb-input-init class="form-outline mb-3">
+              <input type="text" id="zip_code" class="form-control" name="zip_code" maxlength="5" value="{{ userInfo.zip_code }}"/>
+              <label class="form-label" for="zip_code">Zip Code</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit button -->
+        <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-block mb-3" name="general">
+          Update Account
+        </button>
+      </form>
+    </div>
+
+    <!-- Right Column -->
+    <div class="col-md-6">
+      <h2>More Options</h2>
+      {% if userInfo.user_type == "professional" %}
+      {% endif %}
+      <button class="btn btn-danger">DELETE ACCOUNT</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
