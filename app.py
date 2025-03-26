@@ -643,13 +643,32 @@ def get_profs_by_zip_range(lower, upper):
         c = conn.cursor()
 
         c.execute("""
-            SELECT * FROM users
-            WHERE zip_code BETWEEN ? AND ? 
+            SELECT u.id as user_id, u.first_name, u.last_name, u.town, u.zip_code, p.id as prof_id, p.profession, p.hourly_cost, p.description
+            FROM users u
+            JOIN professionals p ON u.id = p.user_id
+            WHERE u.zip_code BETWEEN ? AND ?
             AND user_type = 'professional'
         """, (lower, upper))
 
-        user_rows = c.fetchall()  
-        return [User(row) for row in user_rows] 
+        results = [dict(row) for row in c.fetchall()]
+
+        for prof in results:
+            c.execute("""
+                SELECT AVG(rating) as avg_rating, COUNT(id) as review_count
+                FROM reviews
+                WHERE professional_id = ?
+            """, (prof['prof_id'],))
+            
+            rating_data = c.fetchone()
+            if rating_data:
+                prof['avg_rating'] = round(rating_data['avg_rating'], 1) if rating_data['avg_rating'] else 0
+                prof['review_count'] = rating_data['review_count']
+            else:
+                prof['avg_rating'] = 0
+                prof['review_count'] = 0
+                
+        return results
+    
 
     except sqlite3.Error as e:
         print(f"Error retrieving users: {e}")
