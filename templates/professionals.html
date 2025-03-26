@@ -89,7 +89,7 @@
                 <tr>
                   <td>{{prof.first_name}} {{prof.last_name}}</td>
                   <td>
-                    <a href="/submit_review/{{prof.user_id}}">
+                  <a href="/submit_review/{{prof.user_id}}">
                     {% if prof.avg_rating > 0 %}
                     <span class="text-warning">
                       {% for i in range(prof.avg_rating|int) %}

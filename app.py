@@ -246,7 +246,9 @@ def professionals():
                 
         if "name" in request.form:
             name = request.form.get("search")
-            list = get_users_by_name(name)
+            list = get_professionals_by_name(name)
+            for prof in list:
+                print(prof)
                 
         
     return render_template("professionals.html", professionals=list, user_zip=user_zip)
@@ -531,6 +533,49 @@ def get_professionals():
     except sqlite3.Error as e:
         print(f"Error retrieving professionals: {e}")
         return []
+    finally:
+        if conn:
+            conn.close()
+
+def get_professionals_by_name(name):
+    try:
+        conn = sqlite3.connect('database.db')
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+
+        query = """
+            SELECT u.id as user_id, u.first_name, u.last_name, u.town, u.zip_code, 
+                   p.id as prof_id, p.profession, p.hourly_cost, p.description
+            FROM users u
+            JOIN professionals p ON u.id = p.user_id
+            WHERE u.user_type = 'professional' AND (u.first_name LIKE ? OR u.middle_name LIKE ? OR u.last_name LIKE ?);
+        """
+        
+        search_param = f"%{name}%"
+        c.execute(query, (search_param, search_param, search_param))
+        results = [dict(row) for row in c.fetchall()]
+        
+        for prof in results:
+            c.execute("""
+                SELECT AVG(rating) as avg_rating, COUNT(id) as review_count
+                FROM reviews
+                WHERE professional_id = ?
+            """, (prof['prof_id'],))
+            
+            rating_data = c.fetchone()
+            if rating_data:
+                prof['avg_rating'] = round(rating_data['avg_rating'], 1) if rating_data['avg_rating'] else 0
+                prof['review_count'] = rating_data['review_count']
+            else:
+                prof['avg_rating'] = 0
+                prof['review_count'] = 0
+                
+        return results
+    
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+        return None
+    
     finally:
         if conn:
             conn.close()
