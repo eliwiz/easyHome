@@ -127,7 +127,11 @@
       <h2>More Options</h2>
       {% if userInfo.user_type == "professional" %}
       {% endif %}
-      <button class="btn btn-danger">DELETE ACCOUNT</button>
+      <form action="{{ url_for('deleteUser') }}" method="post">
+        <button onclick="return confirm('Are you sure you want to delete your account? This cannot be undone')" type="submit" class="btn btn-outline-danger">
+            Delete Account
+        </button>
+    </form>
     </div>
   </div>
 </div>

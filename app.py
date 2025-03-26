@@ -227,23 +227,23 @@ def registerProf():
 @app.route('/professionals', methods=["GET", "POST"])
 def professionals():
     list = get_professionals()
-    user_zip = ""
+    user_zip = None
     if current_user.is_authenticated:
         user_zip = get_user_by_id(current_user.id).zip_code
+    
         
     if request.method == "POST":
         if "filters" in request.form:
             zip = request.form.get("zip_code")
             selected_distance = request.form.get("distance")
+            expertise = request.form.getlist("expertise")
+            print(expertise)
             
-            if selected_distance != None:
+            if selected_distance != "0":
                 upper = int(zip) + int(selected_distance)
                 lower = int(zip) - int(selected_distance)
-                list = get_users_by_zip_range(int(lower), int(upper))
-                for user in list:
-                    print(vars(user))  # Prints the attributes of each User object as a dictionary
-            else:
-                list = get_users_by_zip(int(zip))
+                list = get_profs_by_zip_range(int(lower), int(upper))
+                
         if "name" in request.form:
             name = request.form.get("search")
             list = get_users_by_name(name)
@@ -300,6 +300,7 @@ def createReservation(profId):
 @app.route("/editUser", methods=["POST", "GET"])
 @login_required
 def editCustomer():
+    print(current_user.id)
     userInformation = get_user_by_id(current_user.id)
     if request.method == "POST":
         if "general" in request.form:
@@ -324,6 +325,15 @@ def editCustomer():
         if "work" in request.form:
             pass
     return render_template("editUser.html", userInfo= userInformation)
+
+@app.route("/deleteUser", methods=["POST"])
+@login_required
+def deleteUser():
+    if delete_user(current_user.id):
+        flash("User sucessfully deleted", "success")
+    else:
+        flash("Error deleting user", "danger")
+    return render_template("index.html")
 
 @app.route("/manageReservations")
 @login_required
@@ -421,6 +431,7 @@ def indexfull():
 
 @app.route('/test')
 def test():
+    flash("This is a popup alert!", "prompt")  # Sending a message
     return render_template("test.html")
 
 #FUNCTIONS
@@ -557,26 +568,6 @@ def get_user_by_email(email):
     finally:
         if conn:
             conn.close()
-
-def get_users_by_zip(zip_code):
-    try:
-        conn = sqlite3.connect('database.db')
-        conn.row_factory = sqlite3.Row  
-        c = conn.cursor()
-
-        c.execute("SELECT * FROM users WHERE zip_code = ?", (zip_code,))
-        users = [dict(row) for row in c.fetchall()]
-
-        print(users)  # Debugging line to check output
-        return users  
-
-    except sqlite3.Error as e:
-        print(f"Error retrieving users: {e}")
-        return []
-    
-    finally:
-        if conn:
-            conn.close()
           
 def get_users_by_name(name):
     try:
@@ -600,7 +591,7 @@ def get_users_by_name(name):
         if conn:
             conn.close()
 
-def get_users_by_zip_range(lower, upper):
+def get_profs_by_zip_range(lower, upper):
     try:
         conn = sqlite3.connect('database.db')
         conn.row_factory = sqlite3.Row  
@@ -608,7 +599,8 @@ def get_users_by_zip_range(lower, upper):
 
         c.execute("""
             SELECT * FROM users
-            WHERE zip_code BETWEEN ? AND ?
+            WHERE zip_code BETWEEN ? AND ? 
+            AND user_type = 'professional'
         """, (lower, upper))
 
         user_rows = c.fetchall()  
@@ -621,6 +613,7 @@ def get_users_by_zip_range(lower, upper):
     finally:
         if conn:
             conn.close()
+
             
 def get_work_details_by_user(user_id):
     try:

@@ -137,7 +137,7 @@
                           <div class="modal-body">
                             <iframe width="600" height="450" style="border:0" loading="lazy" allowfullscreen
                               referrerpolicy="no-referrer-when-downgrade"
-                              src="https://www.google.com/maps/embed/v1/directions?key=AIzaSyDmYpBjV12iq8-83OxZMK8aujT1AWxb8Sc&origin={{prof.zip_code}}&destination=City+Hall,New+York,NY">
+                              src="https://www.google.com/maps/embed/v1/directions?key=AIzaSyDmYpBjV12iq8-83OxZMK8aujT1AWxb8Sc&origin={%if user_zip == None%}{{prof.zip_code}}{%else%}{{user_zip}}{%endif%}&destination={{prof.zip_code}}">
                             </iframe>
                           </div>
                           <div class="modal-footer">

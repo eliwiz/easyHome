@@ -29,7 +29,7 @@
                 <a href="/submit_review/{{reserve.professional_primary_key}}" class="btn btn-outline-dark">Write a Review</a>
                 <form action="{{ url_for('cancel_reservation') }}" method="post">
                   <input type="hidden" name="reservation_id" value="{{ reserve.work_id }}">
-                  <button type="submit" class="btn btn-outline-danger">
+                  <button onclick="return confirm('Are you sure to delete this reservation?')" type="submit" class="btn btn-outline-danger">
                       Cancel Reservation
                   </button>
               </form>
