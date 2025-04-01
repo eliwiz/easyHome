@@ -1,0 +1,42 @@
+{%extends "base.html"%}
+{%block title%}Edit your reservation{%endblock%}
+
+{%block content%}
+
+<section id="start">
+  <div class="container my-5 py-5">
+    <div class="row featurette py-lg-5 align-items-center">
+        <form action="/editReservation/{{reserve['work_id']}}" method="POST">
+          <div class="text-content ps-md-5">
+            <h4>Edit your project</h4>
+            <input type="hidden" id="profID" name="workID" value="{{reserve['work_id']}}">
+            <div data-mdb-input-init class="form-outline mb-3 w-33">
+              <input type="text" id="form2Example1" class="form-control" name="title" maxlength="50" value="{{ reserve['work_name'] }}"/>
+              <label class="form-label" for="form2Example1">Project Title</label>
+            </div>
+            <div data-mdb-input-init class="form-outline mb-3 w-33">
+                <textarea id="form2Example1" class="form-control" name="desc" rows="5" maxlength="500">{{ reserve['work_description']}}</textarea>
+                <label class="form-label" for="form2Example1">Project Description</label>
+            </div>
+            <div class="row">
+              <div class="col-6">
+                <div data-mdb-input-init class="form-outline mb-3 w-33">
+                  <input type="date" id="form2Example1" class="form-control" name="date" value="{{ reserve['date'] }}"/>
+                  <label class="form-label" for="form2Example1">Project Date</label>
+                </div>
+              </div>
+              <div class="col-6">
+                <div data-mdb-input-init class="form-outline mb-3 w-33">
+                  <input type="time" id="form2Example1" class="form-control" name="time" value="{{ reserve['start_time'] }}"/>
+                  <label class="form-label" for="form2Example1">Project Time</label>
+                </div>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg px-4 me-md-2">Update Project</button>
+          </div>
+        </form>
+    </div>
+  </div>
+</section>
+
+{%endblock%}

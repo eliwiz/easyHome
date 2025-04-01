@@ -1,0 +1,56 @@
+{%extends "base.html"%}
+{%block title%}Pay for Service{%endblock%}
+
+{%block content%}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-6">
+      <h2>Pay for your service</h2> <hr>
+      <p>**As this is a mock please do not enter your information, just click 'pay' button at the end of the form to pay for the service**</p>
+      <form method="POST">
+        <div class="row">
+          <div class="col d-flex gap-1 justify-content-center">
+            <div data-mdb-input-init class="form-outline w-50 mb-3">
+              <input type="text" id="form2Example1" class="form-control" name="fname"  maxlength="25" />
+              <label class="form-label" for="form2Example1">Enter Name on Card</label>
+            </div>
+            <div data-mdb-input-init class="form-outline w-50 mb-3">
+              <input type="text" id="form2Example1" class="form-control" name="fname"  maxlength="25" />
+              <label class="form-label" for="form2Example1">Enter your ZIP</label>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col d-flex gap-1 justify-content-center">
+            <div data-mdb-input-init class="form-outline w-50 mb-3">
+              <input type="text" id="form2Example1" class="form-control" name="fname"  maxlength="25" />
+              <label class="form-label" for="form2Example1">Enter your Credit Card Number</label>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col d-flex gap-1 justify-content-center">
+            <div data-mdb-input-init class="form-outline w-50 mb-3">
+              <input type="text" id="form2Example1" class="form-control" name="fname"  maxlength="25" />
+              <label class="form-label" for="form2Example1">Enter your CVC</label>
+            </div>
+            <div data-mdb-input-init class="form-outline w-50 mb-3">
+              <input type="text" id="form2Example1" class="form-control" name="fname"  maxlength="25" />
+              <label class="form-label" for="form2Example1">Enter Expiration (MM/YY)</label>
+            </div>
+          </div>
+        </div>
+        <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg btn-block mb-3">
+            Pay
+          </button>
+        </form>
+    </div>
+    <div class="col-6">
+      <h4>Cost</h4>
+      <p>{{reserve['total_cost']}}</p>
+    </div>
+  </div>
+
+</div>
+
+{%endblock%}

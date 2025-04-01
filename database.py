@@ -55,6 +55,11 @@ def init_db():
                 work_description VARCHAR2(100),
                 user_id INTEGER NOT NULL,
                 professional_id INTEGER NOT NULL,
+                total_cost REAL,
+                hour_amount INTEGER,
+                date DATE,
+                start_time TIME,
+                is_paid BOOLEAN DEFAULT 0,
                 FOREIGN KEY (user_id) REFERENCES users(id),
                 FOREIGN KEY (professional_id) REFERENCES professionals(id)
               )

@@ -13,7 +13,8 @@
           <th scope="col">Professional's Email</th>
           <th scope="col">Professional's Phone</th>
           <th scope="col">Project Title</th>
-          <th scope="col">Project Description</th>
+          <th scope="col">Project Date</th>
+          <th scope="col">Project Time</th>
           <th scope="col">Options</th>
         </tr>
       </thead>
@@ -24,13 +25,24 @@
             <td>{{ reserve.email}}</td>  
             <td>{{ reserve.phone_number}}</td>  
             <td>{{ reserve.work_name }}</td>
-            <td>{{ reserve.work_description }}</td>
+            <td>{{ reserve.date }}</td>
+            <td>{{ reserve.start_time }}</td>
             <td>
+              {%if reserve.is_paid == false%}
+              <a href="/payReservation/{{reserve.work_id}}"> <button type="submit" class="btn btn-outline-success">
+                Pay
+              </button></a>
+              {%endif%}
+              <a href="/editReservation/{{reserve.work_id}}">
+                <button type="submit" class="btn btn-outline-dark">
+                  Edit
+                </button>
+              </a>
                 <a href="/submit_review/{{reserve.professional_primary_key}}" class="btn btn-outline-dark">Write a Review</a>
                 <form action="{{ url_for('cancel_reservation') }}" method="post">
                   <input type="hidden" name="reservation_id" value="{{ reserve.work_id }}">
                   <button onclick="return confirm('Are you sure to delete this reservation?')" type="submit" class="btn btn-outline-danger">
-                      Cancel Reservation
+                      Cancel 
                   </button>
               </form>
             </td>

@@ -252,42 +252,24 @@ def professionals():
                 
         
     return render_template("professionals.html", professionals=list, user_zip=user_zip)
- 
-# @app.route('/professional/<id>', methods=["GET", "POST"])
-# def professionalPage(id):
-#     if request.method == "POST":
-#         zipcode = request.form.get("zipcode")
-#         if zipcode:
-#             api_key = "AIzaSyDmYpBjV12iq8-83OxZMK8aujT1AWxb8Sc"
-#             iframe_html = Markup(f"""
-#             <iframe
-#               width="600"
-#               height="450"
-#               style="border:0"
-#               loading="lazy"
-#               allowfullscreen
-#               referrerpolicy="no-referrer-when-downgrade"
-#               src="https://www.google.com/maps/embed/v1/directions?key={api_key}&origin={zipcode}&destination=City+Hall,New+York,NY">
-#             </iframe>
-#             """)
-#             return jsonify({"iframe": str(iframe_html)})
-#         else:
-#             return jsonify({"error": "No ZIP code provided."}), 400  # Bad request
-#     return render_template("profPage.html", id=id)
 
 @app.route('/createReservation/<profId>', methods=["GET", "POST"])
 @login_required
 def createReservation(profId):
     if request.method == "GET":
-        professional = get_user_by_id(profId)
+        professional = get_professional_by_id(profId)
         return render_template("createReservation.html", prof=professional)
     if request.method == "POST":
-        print("HELLO")
         prof_id = request.form.get("profID")
         title = request.form.get("title")
         description = request.form.get("desc")
+        date = request.form.get('date')  # YYYY-MM-DD format (string)
+        start = request.form.get('time')  # HH:MM format (string)
+        hours = int(request.form.get('hour_amount'))   
+        cost = request.form['cost']
 
-        if add_work_detail(current_user.id, prof_id, title, description):
+
+        if add_work_detail(current_user.id, prof_id, title, description, cost, hours,date,start):
             # msg = Message("You got a new Reservation!", recipients=[get_user_by_id(profId).email])
             # msg.body = f"You just had a reservation booked by {get_user_by_id(current_user.id).first_name} {get_user_by_id(current_user.id).last_name}. \nThe project name is {title}, and it's decription is {description}. \n Log in to check it out and discuss with the potential client!"
             # mail.send(msg)
@@ -344,6 +326,33 @@ def manageReservations():
     print(reserved)
     return render_template("manageReservations.html", reservations = reserved)
 
+@app.route("/payReservation/<workID>", methods=["GET","POST"])
+@login_required
+def payReservation(workID):
+    reservation = get_work_details_by_id(workID)
+    if request.method=="GET":
+        return render_template("payment.html", reserve = reservation)
+    if request.method=="POST":
+        edit_work_detail(reservation['work_id'], reservation['work_name'], reservation['work_description'], reservation['total_cost'], reservation['hour_amount'], reservation['date'], reservation['start_time'], 1)
+        flash("Thank you for paying!","success")
+        return redirect(url_for("manageReservations")) 
+    
+@app.route("/editReservation/<workID>", methods=["GET", "POST"])
+@login_required
+def editReservation(workID):
+    reservation = get_work_details_by_id(workID)
+    if request.method=="GET":
+        return render_template("editReservation.html", reserve = reservation)
+    if request.method=="POST":
+        print("AH")
+        title = request.form.get("title")
+        description = request.form.get("desc")
+        date = request.form.get('date')  # YYYY-MM-DD format (string)
+        start = request.form.get('time')  # HH:MM format (string)
+
+        edit_work_detail(reservation['work_id'], title, description, reservation['total_cost'], reservation['hour_amount'], date, start, reservation['is_paid'])
+        flash("Successfully edited!","success")
+        return redirect(url_for("manageReservations")) 
 
 @app.route('/submit_review/<professional_id>', methods=["GET", "POST"])
 @login_required
@@ -416,7 +425,7 @@ def view_reviews(professional_id):
 
 @app.route('/cancel_reservation', methods=['POST'])
 def cancel_reservation():
-    reservation_id = request.form.get('reservation_id')  # Get the parameter
+    reservation_id = request.form.get('reservation_id')  
     if reservation_id != None:
         if delete_work_detail(reservation_id):
             flash("Sucessfully cancelled reservation", "success")
@@ -678,25 +687,51 @@ def get_profs_by_zip_range(lower, upper):
         if conn:
             conn.close()
 
+def get_work_details_by_id(work_id):
+    try:
+        conn = sqlite3.connect("database.db")
+        conn.row_factory = sqlite3.Row 
+        c = conn.cursor()
+
+        c.execute("""
+            SELECT 
+                id AS work_id, work_name, work_description,
+                total_cost, hour_amount, date, start_time, is_paid
+            FROM workDetails
+            WHERE id = ?
+        """, (work_id,))
+
+        work_row = c.fetchone()  
+        return dict(work_row) if work_row else None
+
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+        return None
+
+    finally:
+        if conn:
+            conn.close()
             
 def get_work_details_by_user(user_id):
     try:
         conn = sqlite3.connect("database.db")
-        conn.row_factory = sqlite3.Row  
+        conn.row_factory = sqlite3.Row  # Enables column access by name
         c = conn.cursor()
 
         c.execute("""
-            SELECT wd.id AS work_id, wd.work_name, wd.work_description,
-                   wd.professional_id, 
-                   p.id AS professional_primary_key, 
-                   u.first_name, u.last_name, u.email, u.phone_number
+            SELECT 
+                wd.id AS work_id, wd.work_name, wd.work_description,
+                wd.professional_id, wd.total_cost, wd.hour_amount, 
+                wd.date, wd.start_time, wd.is_paid, 
+                p.id AS professional_primary_key, p.profession, p.hourly_cost, p.description,
+                u.id AS user_id, u.first_name, u.last_name, u.email, u.phone_number
             FROM workDetails wd
-            JOIN users u ON wd.professional_id = u.id  
-            LEFT JOIN professionals p ON wd.professional_id = p.user_id 
+            JOIN professionals p ON wd.professional_id = p.id
+            JOIN users u ON p.user_id = u.id  
             WHERE wd.user_id = ?
         """, (user_id,))
 
-        work_rows = c.fetchall()  # Fetch the data BEFORE closing the connection
+        work_rows = c.fetchall()  
         return work_rows
     
     except sqlite3.Error as e:
@@ -705,7 +740,9 @@ def get_work_details_by_user(user_id):
     
     finally:
         if conn:
-            conn.close()  
+            conn.close()
+
+ 
 
 def add_acc(first_name, middle_name, last_name, gender, phone_number, email, password, 
              street_number, street_name, town, state, zip_code, user_type):
@@ -729,15 +766,18 @@ def add_acc(first_name, middle_name, last_name, gender, phone_number, email, pas
         if conn:
             conn.close()
 
-def add_work_detail(user_id, professional_id, work_name, work_description):
+def add_work_detail(user_id, professional_id, work_name, work_description, 
+                    total_cost=0, hour_amount=0, date=None, start_time=None, is_paid=False):
     try:
         conn = sqlite3.connect('database.db')
         c = conn.cursor()
 
         c.execute("""
-            INSERT INTO workDetails (work_name, work_description, user_id, professional_id)
-            VALUES (?, ?, ?, ?)
-        """, (work_name, work_description, user_id, professional_id))
+            INSERT INTO workDetails (work_name, work_description, user_id, professional_id,
+                                     total_cost, hour_amount, date, start_time, is_paid)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (work_name, work_description, user_id, professional_id, 
+              total_cost, hour_amount, date, start_time, is_paid))
 
         conn.commit()
         print("Work detail added successfully")
@@ -845,6 +885,35 @@ def add_review(customer_id, professional_id, rating, comment):
     except sqlite3.Error as e:
         print(f"Error adding review: {e}")
         return False  
+    finally:
+        if conn:
+            conn.close()
+
+def edit_work_detail(work_id, work_name, work_description, total_cost, hour_amount, date, start_time, is_paid):    
+    try:
+        conn = sqlite3.connect('database.db')
+        c = conn.cursor()
+
+        c.execute("""
+            UPDATE workDetails 
+            SET work_name = ?, work_description = ?, total_cost = ?, 
+                hour_amount = ?, date = ?, start_time = ?, is_paid = ?
+            WHERE id = ?
+        """, (work_name, work_description, total_cost, hour_amount, date, start_time, is_paid, work_id))
+
+        conn.commit()
+
+        if c.rowcount > 0:
+            print(f"Work detail with ID {work_id} updated successfully")
+            return True
+        else:
+            print(f"No work detail found with ID {work_id}")
+            return False
+
+    except sqlite3.Error as e:
+        print(f"Error updating work detail: {e}")
+        return False
+
     finally:
         if conn:
             conn.close()
