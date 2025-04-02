@@ -15,7 +15,7 @@
         <form action="/createReservation/{{prof['id']}}" method="POST">
           <div class="text-content ps-md-5">
             <h4>Enter your project</h4>
-            <input type="hidden" id="profID" name="profID" value="{{prof['id']}}">
+            <input type="hidden" id="profID" name="profID" value="{{prof['user_id']}}">
             <div data-mdb-input-init class="form-outline mb-3 w-33">
               <input type="text" id="form2Example1" class="form-control" name="title" maxlength="50" />
               <label class="form-label" for="form2Example1">Project Title</label>

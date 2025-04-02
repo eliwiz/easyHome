@@ -2,6 +2,6 @@ Hello! Welcome to EasyHome's code.
 
 
 The program will send an email to the "professional" account that is booked when an appointment is made
-Email information, feel free to log in if needed:
+Email information, it has two factor authentication for the flask email to work though so you likely cannot access it
 Email: easyhomefdunoreply@gmail.com
 Password: 2nB*/&s8Uu32ZX./

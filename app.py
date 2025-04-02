@@ -49,7 +49,7 @@ app.config['MAIL_PORT'] = 465
 app.config['MAIL_USE_SSL'] = True
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USERNAME'] = 'easyhomefdunoreply@gmail.com'
-app.config['MAIL_PASSWORD'] = '2nB*/&s8Uu32ZX./'  
+app.config['MAIL_PASSWORD'] = 'atod dhkj bwgp znig'  
 app.config['MAIL_DEFAULT_SENDER'] = 'easyhomefdunoreply@gmail.com'
 app.config['MAIL_DEBUG'] = True
 mail = Mail(app)
@@ -268,13 +268,14 @@ def createReservation(profId):
         hours = int(request.form.get('hour_amount'))   
         cost = request.form['cost']
 
-
-        if add_work_detail(current_user.id, prof_id, title, description, cost, hours,date,start):
-            # msg = Message("You got a new Reservation!", recipients=[get_user_by_id(profId).email])
-            # msg.body = f"You just had a reservation booked by {get_user_by_id(current_user.id).first_name} {get_user_by_id(current_user.id).last_name}. \nThe project name is {title}, and it's decription is {description}. \n Log in to check it out and discuss with the potential client!"
-            # mail.send(msg)
-            print("IT WORKED???")
-            flash("Professional created sucessfully!", "success")
+        if add_work_detail(current_user.id, profId, title, description, cost, hours,date,start):
+            msg = Message("You got a new Reservation!", recipients=[get_user_by_id(prof_id).email])
+            msg.body = f"You just had a reservation booked by {get_user_by_id(current_user.id).first_name} {get_user_by_id(current_user.id).last_name}. \nThe project name is {title}, and it is on {date} which starts at {start}, and it {hours} long. It's decription is {description}. \n Log in to check it out and discuss with the client!"
+            mail.send(msg)
+            msg1 = Message("You booked a Reservation!", recipients=[get_user_by_id(current_user.id).email])
+            msg1.body = f"You just booked a reservation with {get_user_by_id(prof_id).first_name} {get_user_by_id(prof_id).last_name}. \nThe project name is {title}, and it is on {date} which starts at {start}, and it {hours} long. It's decription is {description}. \n Your contractor will get in touch soon!"
+            mail.send(msg1)
+            flash("Reservation created sucessfully!", "success")
             return redirect(url_for("manageReservations"))
         else:
             flash("Error creating reservation", "danger")
