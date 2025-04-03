@@ -46,8 +46,29 @@
         </form>
     </div>
     <div class="col-6">
-      <h4>Cost</h4>
-      <p>{{reserve['total_cost']}}</p>
+      <h4>Your Cart</h4>
+      {%for item in cart%}
+                    <div class="card">
+                      <div class="card-body">
+                        <div class="row">
+                          <div class="col-8">
+                            <h5>Project: {{item[1]}}</h5>
+                            <p >With {{item[8]}}</p>
+                            <p >Description{{item[2]}}</p>
+                          </div>
+                          <div class="col-4">
+                            <p>From {{item[5]}} to {{item[6]}}, starts at {{item[7]}} and will last for {{item[4]}} hours</p>
+                            <p>${{item[3]}}</p>
+                            <input type="hidden" name="item_index" value="{{ loop.index }}">
+                            <button type="submit" class="btn btn-danger" name="delete_cart_item">
+                              Delete item
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <hr>
+                    {%endfor%}
     </div>
   </div>
 

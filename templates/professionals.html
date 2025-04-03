@@ -57,21 +57,66 @@
 
     <!-- Main Content -->
     <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 offset-md-3">
-        <section id="feature">
-          <div class="container py-5">
-            <div class="row align-items-center mb-3">
-              <div class="col-md-8">
-                <h2>Find a Professional</h2>
-              </div>
-              <div class="col-md-4">
-                <form method="POST">
-                  <div class="input-group">
-                    <input type="search" class="form-control" placeholder="Search by Name" name="search" />
-                    <button type="submit" class="btn btn-primary" name="name">Search</button>
+      <section id="feature">
+        <div class="container py-5">
+          <div class="row align-items-center mb-3">
+            <div class="col-md-7">
+              <h2>Find a Professional</h2>
+            </div>
+            <div class="col-md-4">
+              <form method="POST">
+                <div class="input-group">
+                  <input type="search" class="form-control" placeholder="Search by Name" name="search" />
+                  <button type="submit" class="btn btn-primary" name="name">Search</button>
+                </div>
+              </form>
+            </div>
+            <div class="col-md-1">
+              <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample"
+                aria-controls="offcanvasExample">
+                🛒
+              </button>
+
+              <div class="offcanvas offcanvas-end bg-white" tabindex="-1" id="offcanvasExample"
+                aria-labelledby="offcanvasExampleLabel">
+                <div class="offcanvas-header">
+                  <h5 class="offcanvas-title" id="offcanvasExampleLabel">Your Cart</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body overflow-auto" style="max-height: 80vh;">
+                  <div>
+                    <h3 style="color:#121B25">Your Cart</h3>
+                    <hr style="color:#121B25;">
+                    <form method="POST">
+                    {%for item in cart%}
+                    <div class="card">
+                      <div class="card-body">
+                        <div class="row">
+                          <div class="col-8">
+                            <h5 style="color:#121B25">Project: {{item[1]}}</h5>
+                            <p style="color:#121B25">With {{item[8]}}</p>
+                          </div>
+                          <div class="col-4">
+                            <p style="color:#121B25">${{item[3]}}</p>
+                            <input type="hidden" name="item_index" value="{{ loop.index }}">
+                            <button type="submit" class="btn btn-danger" name="delete_cart_item">
+                              Delete item
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {%endfor%}
+                  </form>
                   </div>
-                </form>
+                </div>
+                <div class="offcanvas-body">
+                  <a href="/checkout" class="btn btn-primary">Checkout</a> 
+                </div>
               </div>
             </div>
+
+          </div>
           <div class="row">
             <table class="table table-striped table-light">
               <thead>
@@ -89,37 +134,37 @@
                 <tr>
                   <td>{{prof.first_name}} {{prof.last_name}}</td>
                   <td>
-                  <a href="/submit_review/{{prof.user_id}}">
+                    <a href="/submit_review/{{prof.user_id}}">
+                      {% if prof.avg_rating > 0 %}
+                      <span class="text-warning">
+                        {% for i in range(prof.avg_rating|int) %}
+                        <i class="fas fa-star"></i>
+                        {% endfor %}
+                        {% if prof.avg_rating % 1 >= 0.5 %}
+                        <i class="fas fa-star-half-alt"></i>
+                        {% endif %}
+                      </span>
+                      {{ prof.avg_rating }} ({{ prof.review_count }} reviews)
+                      {% else %}
+                      No ratings yet
+                      {% endif %}
+                    </a>
+                  </td>
+                  <td>
                     {% if prof.avg_rating > 0 %}
                     <span class="text-warning">
                       {% for i in range(prof.avg_rating|int) %}
-                        <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
                       {% endfor %}
                       {% if prof.avg_rating % 1 >= 0.5 %}
-                        <i class="fas fa-star-half-alt"></i>
-                      {% endif %}
-                    </span>
-                    {{ prof.avg_rating }} ({{ prof.review_count }} reviews)
-                  {% else %}
-                    No ratings yet
-                  {% endif %}
-                </a>
-                </td>
-                <td>
-                  {% if prof.avg_rating > 0 %}
-                    <span class="text-warning">
-                      {% for i in range(prof.avg_rating|int) %}
-                        <i class="fas fa-star"></i>
-                      {% endfor %}
-                      {% if prof.avg_rating % 1 >= 0.5 %}
-                        <i class="fas fa-star-half-alt"></i>
+                      <i class="fas fa-star-half-alt"></i>
                       {% endif %}
                     </span>
                     <a href="/reviews/{{prof.prof_id}}">{{ prof.avg_rating }} ({{ prof.review_count }} reviews)</a>
-                  {% else %}
+                    {% else %}
                     <a href="/reviews/{{prof.prof_id}}">See Reviews</a>
-                  {% endif %}
-                </td>
+                    {% endif %}
+                  </td>
                   <td>{{prof.profession}}</td>
                   <td><button type="button" class="btn btn-outline-dark" data-bs-toggle="modal"
                       data-bs-target="#exampleModal{{ loop.index }}">
@@ -147,7 +192,8 @@
                       </div>
                     </div>
                   </td>
-                  <td><a href="/createReservation/{{prof.prof_id}}" class="btn btn-primary" role="button">Book a Reservation</a></td>
+                  <td><a href="/createReservation/{{prof.prof_id}}" class="btn btn-primary" role="button">Book a
+                      Reservation</a></td>
                 </tr>
                 {%endfor%}
               </tbody>

@@ -28,11 +28,6 @@
             <td>{{ reserve.date }}</td>
             <td>{{ reserve.start_time }}</td>
             <td>
-              {%if reserve.is_paid == false%}
-              <a href="/payReservation/{{reserve.work_id}}"> <button type="submit" class="btn btn-outline-success">
-                Pay
-              </button></a>
-              {%endif%}
               <a href="/editReservation/{{reserve.work_id}}">
                 <button type="submit" class="btn btn-outline-dark">
                   Edit

@@ -13,6 +13,7 @@
              
       <div class="col-md-8">
         <form action="/createReservation/{{prof['id']}}" method="POST">
+          <input type="hidden" id="profName" name="profName" value="{{prof['first_name']}} {{prof['last_name']}}">
           <div class="text-content ps-md-5">
             <h4>Enter your project</h4>
             <input type="hidden" id="profID" name="profID" value="{{prof['user_id']}}">
@@ -27,23 +28,32 @@
             <div class="row">
               <div class="col-6">
                 <div data-mdb-input-init class="form-outline mb-3 w-33">
-                  <input type="date" id="form2Example1" class="form-control" name="date"/>
-                  <label class="form-label" for="form2Example1">Project Date</label>
+                  <input type="date" id="form2Example1" class="form-control" name="startDate"/>
+                  <label class="form-label" for="form2Example1">Project Start Date</label>
                 </div>
               </div>
+              <div class="col-6">
+                <div data-mdb-input-init class="form-outline mb-3 w-33">
+                  <input type="date" id="form2Example1" class="form-control" name="endDate"/>
+                  <label class="form-label" for="form2Example1">Project End Date</label>
+                </div>
+              </div>
+              
+            </div>
+            <!-- Hours input -->
+            <div class="row"> 
               <div class="col-6">
                 <div data-mdb-input-init class="form-outline mb-3 w-33">
                   <input type="time" id="form2Example1" class="form-control" name="time" />
                   <label class="form-label" for="form2Example1">Project Time</label>
                 </div>
               </div>
-            </div>
-            <!-- Hours input -->
-            <div class="row"> 
-              <div data-mdb-input-init class="form-outline mb-3 w-33">
-                <input type="number" id="hoursInput" class="form-control" name="hour_amount" placeholder="Enter hours" />
-                <label class="form-label" for="hoursInput">Hour Amount</label>
-              </div> 
+              <div class="col-6">
+                <div data-mdb-input-init class="form-outline mb-3 w-33">
+                  <input type="number" id="hoursInput" class="form-control" name="hour_amount" placeholder="Enter hours" />
+                  <label class="form-label" for="hoursInput">Predicted Hour Amount</label>
+                </div> 
+              </div>
             </div>
 
             <!-- Cost input, will be updated automatically -->
