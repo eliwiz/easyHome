@@ -370,7 +370,7 @@ def editCustomer():
             street = request.form.get("street")
             town = request.form.get("town")
             state = request.form.get("state")
-            zip = request.form.get("zip")
+            zip = request.form.get("zip_code")
             if edit_user(current_user.id, fname, mname, lname, gender, phone, email, password, apt, street, town, state, zip):   
                 flash("Sucessfully updated user details!", "success") 
                 userInformation = get_user_by_id(current_user.id)
