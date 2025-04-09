@@ -3,7 +3,6 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from markupsafe import Markup, escape
 import os, io
 from werkzeug.utils import secure_filename
-from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_mail import Mail
 from flask_mail import Message
@@ -11,6 +10,8 @@ from flask_login import LoginManager, UserMixin
 from flask_login import login_user, current_user, logout_user, login_required
 from functools import wraps
 import sqlite3
+from datetime import datetime, timedelta
+from urllib.parse import quote
 
 from database import init_db, reset_db
 con = sqlite3.connect("database.db")
@@ -264,16 +265,8 @@ def createReservation(profId):
         cost = request.form['cost']
         name = request.form['profName']
 
-        # if add_work_detail(current_user.id, profId, title, description, cost, hours,date,start):
-            
-            # msg = Message("You got a new Reservation!", recipients=[get_user_by_id(prof_id).email])
-            # msg.body = f"You just had a reservation booked by {get_user_by_id(current_user.id).first_name} {get_user_by_id(current_user.id).last_name}. \nThe project name is {title}, and it is on {date} which starts at {start}, and it {hours} long. It's decription is {description}. \n Log in to check it out and discuss with the client!"
-            # mail.send(msg)
-            # msg1 = Message("You booked a Reservation!", recipients=[get_user_by_id(current_user.id).email])
-            # msg1.body = f"You just booked a reservation with {get_user_by_id(prof_id).first_name} {get_user_by_id(prof_id).last_name}. \nThe project name is {title}, and it is on {date} which starts at {start}, and it {hours} long. It's decription is {description}. \n Your contractor will get in touch soon!"
-            # mail.send(msg1)
         cart.append([profId, title, description, cost, hours, startDate, endDate, time, name])
-        print(cart)
+        # print(cart)
         flash("Reservation added to cart!", "success")
         return redirect(url_for("professionals"))
             
@@ -281,7 +274,7 @@ def createReservation(profId):
 @login_required
 def manageReservations():
     reserved = get_work_details_by_user(current_user.id)
-    print(reserved)
+    # print(reserved)
     return render_template("manageReservations.html", reservations = reserved)
 
 @app.route("/checkout", methods=["GET","POST"])
@@ -291,13 +284,39 @@ def checkout():
     if request.method=="GET":
         return render_template("checkout.html", cart=cart)
     if request.method=="POST":
+        sentEmail = request.form.get('sendEmails')
         for item in cart:
             if add_work_detail(current_user.id, item[0], item[1], item[2], item[3], item[4], item[5], item[6], item[7]):
-                pass
+                if sentEmail == "on":
+                    # msg = Message("You got a new Reservation!", recipients=[get_user_by_id(item[0]).email])
+                    # msg.body = f"You just had a reservation booked by {get_user_by_id(current_user.id).first_name} {get_user_by_id(current_user.id).last_name}. \nThe project name is {item[1]}, and it is from {item[5]} to {item[6]}. It starts at {item[7]}, and it {items[4]} long. It's decription is {item[2]}. \n Log in to check it out and discuss with the client!"
+                    # mail.send(msg)
+                    start_date = datetime.strptime(f"{item[5]} {item[7]}", "%Y-%m-%d %H:%M")
+                    duration_hours = int(item[4])
+                    end_date = start_date + timedelta(hours=duration_hours)
+
+                    # Format to Google Calendar format: YYYYMMDDTHHMMSSZ
+                    start_str = start_date.strftime("%Y%m%dT%H%M%SZ")
+                    end_str = end_date.strftime("%Y%m%dT%H%M%SZ")
+
+                    event_title = f"Reservation: {item[1]}"
+                    event_details = f"Project with {get_user_by_id(item[0])['first_name']} {get_user_by_id(item[0])['last_name']}. Description: {item[2]}"
+                    calendar_url = f"https://calendar.google.com/calendar/render?action=TEMPLATE&text={quote(event_title)}&dates={start_str}/{end_str}&details={quote(event_details)}"
+                    
+                    
+                    msg1 = Message("You booked a Reservation!", recipients=[get_user_by_id(current_user.id).email])
+                    msg1.body = (
+                        f"You just booked a reservation with {get_user_by_id(item[0])['first_name']} {get_user_by_id(item[0])['last_name']}.\n"
+                        f"The project name is {item[1]}, and it is from {item[5]} to {item[6]}. It starts at {item[7]}, and it's {item[4]} hour(s) long. "
+                        f"Its description is: {item[2]}.\nYour contractor will get in touch soon!\n\n"
+                        f"📅 Add to your calendar: {calendar_url}"
+                    )
+                    mail.send(msg1)
             else:
                 flash("There was an error in booking these reservations", "warning")
                 break
         session['cart'].clear()     
+        
         flash("Thank you for your purchase!","success")
         return redirect(url_for("manageReservations")) 
     
@@ -308,7 +327,7 @@ def editReservation(workID):
     if request.method=="GET":
         return render_template("editReservation.html", reserve = reservation)
     if request.method=="POST":
-        print("AH")
+        # print("AH")
         title = request.form.get("title")
         description = request.form.get("desc")
         startDate = request.form.get('startDate')  # YYYY-MM-DD format (string)
@@ -335,7 +354,7 @@ def cancel_reservation():
 @app.route("/editUser", methods=["POST", "GET"])
 @login_required
 def editCustomer():
-    print(current_user.id)
+    # print(current_user.id)
     userInformation = get_user_by_id(current_user.id)
     if request.method == "POST":
         if "general" in request.form:
