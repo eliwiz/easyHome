@@ -19,7 +19,7 @@ def init_db():
                 street_name VARCHAR2(35),
                 town VARCHAR2(30),
                 state CHAR(2),
-                zip_code NUMBER(5),
+                zip_code VARCHAR2(5),
                 user_type VARCHAR2(20) CHECK (user_type IN ('customer','professional')) DEFAULT 'customer'
             )
         """)
