@@ -220,6 +220,25 @@ a.password:hover {
   transition: background 0.3s ease-out;
 }
 
+.star-rating input[type="radio"] {
+  display: none; /* Hides the radio buttons */
+}
+
+.star-colored i {
+  color: #ffc107 !important; /* yellow */
+}
+
+.star-colored svg {
+  fill: #ffc107 !important;
+}
+
+.star-colored * {
+  opacity: 1 !important;
+  filter: none !important;
+  color: #ffc107 !important;
+  fill: #ffc107 !important;
+}
+
 a.navbar-brand {
   color: var(--body-text-color);
 }

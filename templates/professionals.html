@@ -136,7 +136,7 @@
                   <td>
                     <a href="/submit_review/{{prof.prof_id}}">
                       {% if prof.avg_rating > 0 %}
-                      <span class="text-warning">
+                      <span class="star-colored">
                         {% for i in range(prof.avg_rating|int) %}
                         <i class="fas fa-star"></i>
                         {% endfor %}
@@ -152,7 +152,7 @@
                   </td>
                   <td>
                     {% if prof.avg_rating > 0 %}
-                    <span class="text-warning">
+                    <span class="star-colored">
                       {% for i in range(prof.avg_rating|int) %}
                       <i class="fas fa-star"></i>
                       {% endfor %}

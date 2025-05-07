@@ -16,19 +16,22 @@
       <div class="col-md-8">
         <form method="POST" action="{{ url_for('submit_review', professional_id=prof.id) }}">
           <div class="text-content ps-md-5">
-              <div class="star-rating">
-                  <input type="radio" id="star5" name="rating" value="1" required />
-                  <label for="star5">1</label>
-                  <input type="radio" id="star4" name="rating" value="2" />
-                  <label for="star4">2</label>
-                  <input type="radio" id="star3" name="rating" value="3" />
-                  <label for="star3">3</label>
-                  <input type="radio" id="star2" name="rating" value="4" />
-                  <label for="star2">4</label>
-                  <input type="radio" id="star1" name="rating" value="5"/>
-                  <label for="star1">5</label>
-                  <!-- <label for="star1" class="fas fa-star"></label> -->
-              </div>
+            <div class="star-rating star-colored">
+              <input type="radio" id="star5" name="rating" value="5" required />
+              <label for="star5"><i class="fas fa-star"></i></label>
+            
+              <input type="radio" id="star4" name="rating" value="4" />
+              <label for="star4"><i class="fas fa-star"></i></label>
+            
+              <input type="radio" id="star3" name="rating" value="3" />
+              <label for="star3"><i class="fas fa-star"></i></label>
+            
+              <input type="radio" id="star2" name="rating" value="2" />
+              <label for="star2"><i class="fas fa-star"></i></label>
+            
+              <input type="radio" id="star1" name="rating" value="1" />
+              <label for="star1"><i class="fas fa-star"></i></label>
+            </div>
               <p class="mt-2">Click to rate</p>
               <div data-mdb-input-init class="form-outline mb-3 w-33">
                 <textarea class="form-control" id="comment" name="comment" rows="5" maxlength="500" required></textarea>
