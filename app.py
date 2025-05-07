@@ -26,7 +26,7 @@ c = conn.cursor()
 c.execute("SELECT name FROM sqlite_master WHERE type='table';")
 tables = c.fetchall()
 
-print("Existing tables:", tables)
+# print("Existing tables:", tables)
 
 conn.close()
 
@@ -87,7 +87,7 @@ def load_user(user_id):
 def index():
     # check_columns()
     cart = session.get('cart', [])
-    print(cart)
+    # print(cart)
     return render_template("index.html")
 
 @app.route('/login', methods=["GET", "POST"])
