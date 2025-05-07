@@ -4,79 +4,145 @@
 {%block content%}
 <div class="container-fluid">
   <div class="row">
-    <div class="col-6">
-      <h2>Pay for your service</h2> <hr>
-      <p>**As this is a mock please do not enter your information, just click 'pay' button at the end of the form to pay for the service**</p>
-      <form method="POST">
-        <div class="row">
-          <div class="col d-flex gap-1 justify-content-center">
-            <div data-mdb-input-init class="form-outline w-50 mb-3">
-              <input type="text" id="form2Example1" class="form-control" name="fname"  maxlength="25" />
-              <label class="form-label" for="form2Example1">Enter Name on Card</label>
-            </div>
-            <div data-mdb-input-init class="form-outline w-50 mb-3">
-              <input type="text" id="form2Example1" class="form-control" name="fname"  maxlength="25" />
-              <label class="form-label" for="form2Example1">Enter your ZIP</label>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col d-flex gap-1 justify-content-center">
-            <div data-mdb-input-init class="form-outline w-50 mb-3">
-              <input type="text" id="form2Example1" class="form-control" name="fname"  maxlength="25" />
-              <label class="form-label" for="form2Example1">Enter your Credit Card Number</label>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col d-flex gap-1 justify-content-center">
-            <div data-mdb-input-init class="form-outline w-50 mb-3">
-              <input type="text" id="form2Example1" class="form-control" name="fname"  maxlength="3" />
-              <label class="form-label" for="form2Example1">Enter your CVC</label>
-            </div>
-            <div data-mdb-input-init class="form-outline w-50 mb-3">
-              <input type="text" id="form2Example1" class="form-control" name="fname"  maxlength="5" />
-              <label class="form-label" for="form2Example1">Enter Expiration (MM/YY)</label>
+    <div class="col-6" id="switching">
+      <!-- Toggle Buttons -->
+      <div class="mb-3 d-flex p-2 justify-content-center">
+        <button class="btn btn-outline-primary me-2 btn-lg" onclick="showView('credit')">Credit Card</button>
+        <button class="btn btn-outline-secondary btn-lg" onclick="showView('alt')">PayPal</button>
+      </div>
+
+      <!-- Credit Card View -->
+      <div id="creditView">
+        <h2>Pay with Credit Card</h2>
+        <hr>
+        <p><strong>**As this is a mock, please do not enter your real information. Just click 'Pay' to simulate
+            payment.**</strong></p>
+        <form method="POST">
+          <div class="row">
+            <div class="col d-flex gap-1 justify-content-center">
+              <div class="form-outline w-50 mb-3">
+                <input type="text" class="form-control" name="nameOnCard" maxlength="25" />
+                <label class="form-label">Enter Name on Card</label>
+              </div>
+              <div class="form-outline w-50 mb-3">
+                <input type="text" class="form-control" name="zip" maxlength="25" />
+                <label class="form-label">Enter your ZIP</label>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="form-check mb-3">
-          <input type="checkbox" id="form2Example1" class="form-check-input" name="sendEmails">
-          <label class="form-check-label" for="form2Example1">
-            Check for confirmation email to be sent to you and professional(s)
-          </label>
-        </div>        
-        <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg btn-block mb-3">
-            Pay
-          </button>
+          <div class="row">
+            <div class="col d-flex gap-1 justify-content-center">
+              <div class="form-outline w-50 mb-3">
+                <input type="text" class="form-control" name="ccNumber" maxlength="25" />
+                <label class="form-label">Enter your Credit Card Number</label>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col d-flex gap-1 justify-content-center">
+              <div class="form-outline w-50 mb-3">
+                <input type="text" class="form-control" name="cvc" maxlength="3" />
+                <label class="form-label">Enter your CVC</label>
+              </div>
+              <div class="form-outline w-50 mb-3">
+                <input type="text" class="form-control" name="exp" maxlength="5" />
+                <label class="form-label">Enter Expiration (MM/YY)</label>
+              </div>
+            </div>
+          </div>
+          <div class="form-check mb-3">
+            <input type="checkbox" class="form-check-input" name="sendEmails">
+            <label class="form-check-label">
+              Check for confirmation email to be sent to you and professional(s)
+            </label>
+          </div>
+          <button type="submit" class="btn btn-primary btn-lg btn-block mb-3">Pay</button>
         </form>
+      </div>
+
+      <!-- Alternate Payment View -->
+      <div id="altView" style="display: none;">
+        <form method="POST">
+        <h2>Pay with PayPal</h2>
+        <hr>
+        <p>Please do not enter any actual information, this is a mock payment platform</p>
+        <script src="https://www.paypal.com/sdk/js?client-id=AcasRvZAhCCNBQULYGMwFoF6I5odPce3LJ4C0TdPBvhIrnAATbpnkqmeTLtTf2xKwY-Sn3AFPXaJwZAV&currency=USD"></script>
+        <!-- Set up a container element for the button -->
+        <div id="paypal-button-container"></div>
+        <script>
+          paypal.Buttons({
+            // Sets up the transaction when a payment button is clicked
+            createOrder: (data, actions) => {
+              return actions.order.create({
+                purchase_units: [{
+                  amount: {
+                    value: '77.44' // Can also reference a variable or function
+                  }
+                }]
+              });
+            },
+            // Finalize the transaction after payer approval
+            onApprove: (data, actions) => {
+              return actions.order.capture().then(function (orderData) {
+                // Successful capture! For dev/demo purposes:
+                console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
+                const transaction = orderData.purchase_units[0].payments.captures[0];
+                alert(`Transaction ${transaction.status}: ${transaction.id}\n\nSee console for all available details`);
+                // When ready to go live, remove the alert and show a success message within this page. For example:
+                // const element = document.getElementById('paypal-button-container');
+                // element.innerHTML = '<h3>Thank you for your payment!</h3>';
+                // Or go to another URL:  actions.redirect('thank_you.html');
+              });
+            }
+          }).render('#paypal-button-container');
+        </script>
+        <button type="submit" class="btn btn-primary btn-lg btn-block mb-3">Confirm Checkout</button>
+      </form>
+      </div>
     </div>
+
     <div class="col-6">
       <h4>Your Cart</h4>
-      {%for item in cart%}
-                    <div class="card">
-                      <div class="card-body">
-                        <div class="row">
-                          <div class="col-8">
-                            <h5>Project: {{item[1]}}</h5>
-                            <p >With {{item[8]}}</p>
-                            <p >Description{{item[2]}}</p>
-                          </div>
-                          <div class="col-4">
-                            <p>From {{item[5]}} to {{item[6]}}, starts at {{item[7]}} and will last for {{item[4]}} hours</p>
-                            <p>${{item[3]}}</p>
-                            <input type="hidden" name="item_index" value="{{ loop.index }}">
-                            <button type="submit" class="btn btn-danger" name="delete_cart_item">
-                              Delete item
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <hr>
-                    {%endfor%}
+      {% for item in cart %}
+      <div class="card">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-8">
+              <h5>Project: {{ item[1] }}</h5>
+              <p>With {{ item[8] }}</p>
+              <p>Description: {{ item[2] }}</p>
+            </div>
+            <div class="col-4">
+              <p>From {{ item[5] }} to {{ item[6] }}, starts at {{ item[7] }} and will last for {{ item[4] }} hours</p>
+              <p>${{ item[3] }}</p>
+              <input type="hidden" name="item_index" value="{{ loop.index }}">
+              <button type="submit" class="btn btn-danger" name="delete_cart_item">
+                Delete item
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <hr>
+      {% endfor %}
     </div>
   </div>
+
+  <!-- JavaScript to toggle views -->
+  <script>
+    function showView(view) {
+      const credit = document.getElementById('creditView');
+      const alt = document.getElementById('altView');
+
+      if (view === 'credit') {
+        credit.style.display = 'block';
+        alt.style.display = 'none';
+      } else {
+        credit.style.display = 'none';
+        alt.style.display = 'block';
+      }
+    }
+  </script>
 
 </div>
 

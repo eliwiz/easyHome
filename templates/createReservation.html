@@ -28,14 +28,14 @@
             <div class="row">
               <div class="col-6">
                 <div data-mdb-input-init class="form-outline mb-3 w-33">
-                  <input type="date" id="form2Example1" class="form-control" name="startDate"/>
-                  <label class="form-label" for="form2Example1">Project Start Date</label>
+                  <input type="date" id="startDate" class="form-control" name="startDate" />
+                  <label class="form-label" for="startDate">Project Start Date</label>
                 </div>
               </div>
               <div class="col-6">
                 <div data-mdb-input-init class="form-outline mb-3 w-33">
-                  <input type="date" id="form2Example1" class="form-control" name="endDate"/>
-                  <label class="form-label" for="form2Example1">Project End Date</label>
+                  <input type="date" id="endDate" class="form-control" name="endDate" />
+                  <label class="form-label" for="endDate">Project End Date</label>
                 </div>
               </div>
               
@@ -50,7 +50,18 @@
               </div>
               <div class="col-6">
                 <div data-mdb-input-init class="form-outline mb-3 w-33">
-                  <input type="number" id="hoursInput" class="form-control" name="hour_amount" placeholder="Enter hours" />
+                  <div class="dropdown mb-2">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="projectTypeDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                      Type of Project
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="projectTypeDropdown">
+                      <li><a class="dropdown-item" href="#" data-hours="2">Fix a small pipe leak - 2 hours</a></li>
+                      <li><a class="dropdown-item" href="#" data-hours="4">Install new Sink - 4 hours</a></li>
+                      <li><a class="dropdown-item" href="#" data-hours="3">Replace door - 3 hours</a></li>
+                      <li><a class="dropdown-item" href="#" data-hours="2">Replace light fixture - 2 hours</a></li>
+                    </ul>
+                  </div>
+                  <input type="hidden" id="hoursInput" class="form-control" name="hour_amount" placeholder="Enter hours" />
                   <label class="form-label" for="hoursInput">Predicted Hour Amount</label>
                 </div> 
               </div>
@@ -73,18 +84,30 @@
 </section>
 
 <script>
-  // Assuming prof['hourly_cost'] is available as a JavaScript variable
-  var hourlyCost = {{ prof['hourly_cost'] | tojson }};  // Pass it from the Flask template
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById("startDate").setAttribute("min", today);
+  document.getElementById("endDate").setAttribute("min", today);
 
-  // Function to update the cost
+
+  const hourlyCost = {{ prof['hourly_cost'] | tojson }};
   function updateCost() {
-    var hours = document.getElementById("hoursInput").value;  // Get hours input value
-    var cost = hours * hourlyCost;  // Calculate cost
-    document.getElementById("costInput").value = cost.toFixed(2);  // Set cost in the cost input field
+    const hours = document.getElementById("hoursInput").value;
+    const cost = hours * hourlyCost;
+    document.getElementById("costInput").value = cost.toFixed(2);
   }
 
-  // Attach event listener to the hours input
   document.getElementById("hoursInput").addEventListener("input", updateCost);
+
+  // Handle dropdown selection
+  document.querySelectorAll(".dropdown-item").forEach(function (item) {
+    item.addEventListener("click", function (e) {
+      e.preventDefault();
+      const selectedHours = this.getAttribute("data-hours");
+      document.getElementById("hoursInput").value = selectedHours;
+      updateCost();
+      document.getElementById("projectTypeDropdown").textContent = this.textContent;
+    });
+  });
 </script>
 
 {%endblock%}

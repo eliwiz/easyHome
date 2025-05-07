@@ -261,7 +261,8 @@ def createReservation(profId):
         startDate = request.form.get('startDate')  # YYYY-MM-DD format (string)
         endDate = request.form.get('endDate')  # YYYY-MM-DD format (string)
         time = request.form.get('time')  # HH:MM format (string)
-        hours = int(request.form.get('hour_amount'))   
+        hours = int(request.form.get('hour_amount')) 
+        # print(hours)  
         cost = request.form['cost']
         name = request.form['profName']
 
