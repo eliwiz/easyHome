@@ -66,6 +66,15 @@
                   <li><a href="/checkout" class="dropdown-item">Checkout</a></li>
                 </ul>
               </li>
+              {%if current_user.id == 1%}
+                <li class="nav-item dropdown ">
+                  <a class="nav-link me-md-4 text-center dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
+                    aria-expanded="false">Admin</a>
+                  <ul class="dropdown-menu dropdown-menu-dark">
+                    <li><a href="/allReservationHistory" class="dropdown-item">View All Reservation History</a></li>
+                  </ul>
+                </li>
+                {%endif%}
                 {%if current_user.first_name != null%}
                 <li class="nav-item dropdown ">
                   <a class="nav-link me-md-4 text-center dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
@@ -73,6 +82,7 @@
                   <ul class="dropdown-menu dropdown-menu-dark">
                     <li><a href="/editUser" class="dropdown-item">Edit User Information</a></li>
                     <li><a href="/manageReservations" class="dropdown-item">Manage Reservations</a></li>
+                    <li><a href="/reservationHistory" class="dropdown-item">Show Reservation History</a></li>
                     <li><hr></li>
                     <li><a href="/logout" class="dropdown-item">Log Out </a></li>
                   </ul>

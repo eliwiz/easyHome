@@ -287,7 +287,7 @@ def checkout():
     if request.method=="POST":
         sentEmail = request.form.get('sendEmails')
         for item in cart:
-            if add_work_detail(current_user.id, item[0], item[1], item[2], item[3], item[4], item[5], item[6], item[7]):
+            if add_work_detail(current_user.id, item[0], item[1], item[2], item[3], item[4], item[5], item[6], item[7]) and add_work_history(current_user.id, item[0], item[1], item[2], item[3], item[4], item[5], item[6], item[7]):
                 if sentEmail == "on":
                     # msg = Message("You got a new Reservation!", recipients=[get_user_by_id(item[0]).email])
                     # msg.body = f"You just had a reservation booked by {get_user_by_id(current_user.id).first_name} {get_user_by_id(current_user.id).last_name}. \nThe project name is {item[1]}, and it is from {item[5]} to {item[6]}. It starts at {item[7]}, and it {items[4]} long. It's decription is {item[2]}. \n Log in to check it out and discuss with the client!"
@@ -459,6 +459,22 @@ def view_reviews(professional_id):
     finally:
         if conn:
             conn.close()
+            
+#reservation History pages
+
+@app.route("/reservationHistory")
+@login_required
+def reservationHistory():
+    reserved = get_work_history_by_user(current_user.id)
+    return render_template("history.html", reservations = reserved)
+
+#admin pages
+
+@app.route("/allReservationHistory")
+@login_required
+def allReservationHistory():
+    reserved = get_all_work_history()
+    return render_template("adminHistory.html", reservations = reserved)
 
 
 #FUNCTIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -906,6 +922,96 @@ def delete_work_detail(work_id):
         if conn:
             conn.close()
             
+#workHistory Table Functions
+
+def add_work_history(user_id, professional_id, work_name, work_description, 
+                     total_cost, hour_amount, start_date, end_date, start_time, is_paid=True):
+    """Add a new work history entry."""
+    try:
+        conn = sqlite3.connect('database.db')
+        c = conn.cursor()
+
+        c.execute("""
+            INSERT INTO workHistory (work_name, work_description, user_id, professional_id,
+                                     total_cost, hour_amount, start_date, end_date, start_time, is_paid)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (work_name, work_description, user_id, professional_id, 
+              total_cost, hour_amount, start_date, end_date, start_time, is_paid))
+
+        conn.commit()
+        print("Work history added successfully")
+        return True
+
+    except sqlite3.Error as e:
+        print(f"Error adding work history: {e}")
+        return False
+
+    finally:
+        if conn:
+            conn.close()
+
+def get_work_history_by_user(user_id):
+    """Fetch all work history records related to a specific user."""
+    try:
+        conn = sqlite3.connect("database.db")
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+
+        c.execute("""
+            SELECT 
+                wh.id AS work_id, wh.work_name, wh.work_description,
+                wh.professional_id, wh.total_cost, wh.hour_amount, 
+                wh.start_date, wh.end_date, wh.start_time, wh.is_paid, 
+                p.id AS professional_primary_key, p.profession, p.hourly_cost, p.description,
+                u.id AS user_id, u.first_name, u.last_name, u.email, u.phone_number
+            FROM workHistory wh
+            JOIN professionals p ON wh.professional_id = p.id
+            JOIN users u ON p.user_id = u.id  
+            WHERE wh.user_id = ?
+        """, (user_id,))
+
+        work_rows = c.fetchall()
+        return [dict(row) for row in work_rows] if work_rows else None
+
+    except sqlite3.Error as e:
+        print(f"Error fetching work history: {e}")
+        return None
+
+    finally:
+        if conn:
+            conn.close()
+
+def get_all_work_history():
+    """Fetch all work history records from the database."""
+    try:
+        conn = sqlite3.connect("database.db")
+        conn.row_factory = sqlite3.Row  # Enables dictionary-like access to rows
+        c = conn.cursor()
+
+        c.execute("""
+            SELECT 
+                wh.id AS work_id, wh.work_name, wh.work_description,
+                wh.user_id, wh.professional_id, wh.total_cost, wh.hour_amount,
+                wh.start_date, wh.end_date, wh.start_time, wh.is_paid,
+                u.first_name AS user_first_name, u.last_name AS user_last_name,
+                p.profession, p.hourly_cost
+            FROM workHistory wh
+            JOIN users u ON wh.user_id = u.id
+            JOIN professionals p ON wh.professional_id = p.id
+        """)
+
+        rows = c.fetchall()
+        return [dict(row) for row in rows] if rows else []
+
+    except sqlite3.Error as e:
+        print(f"Error fetching work history: {e}")
+        return []
+
+    finally:
+        if conn:
+            conn.close()
+
+            
 #Review Table                       
 def add_review(customer_id, professional_id, rating, comment):
     try:
@@ -926,8 +1032,38 @@ def add_review(customer_id, professional_id, rating, comment):
     finally:
         if conn:
             conn.close()
+            
+#admin account
+def create_admin():
+    try:
+        conn = sqlite3.connect('database.db')
+        c = conn.cursor()
+
+        # Check if a user with a specific email or ID already exists
+        c.execute("SELECT * FROM users WHERE id = 1")
+        if c.fetchone():
+            print("Default user already exists.")
+            return
+
+        # Create the default user with ID=1
+        c.execute("""
+            INSERT INTO users (first_name, middle_name, last_name, gender, phone_number, email, password, 
+                               street_number, street_name, town, state, zip_code, user_type)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, ("Admin", "Admin", "User", "O", "0000000000", "easyhomefdunoreply@gmail.com", "admin123",
+              "1", "Admin Street", "AdminTown", "AA", "00000", "customer"))
+
+        conn.commit()
+        print("Default user created successfully.")
+    except sqlite3.Error as e:
+        print(f"Error creating default user: {e}")
+    finally:
+        if conn:
+            conn.close()
+
 
 if __name__ == "__main__":
     app.secret_key = "jfvdjhklvdfhgspierytuepsri5uw43hkjlh" 
     init_db()
+    create_admin()
     app.run(debug=True, port="9000")

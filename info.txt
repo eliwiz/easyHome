@@ -5,3 +5,7 @@ The program will send an email to the "professional" account that is booked when
 Email information, it has two factor authentication for the flask email to work though so you likely cannot access it
 Email: easyhomefdunoreply@gmail.com
 Password: 2nB*/&s8Uu32ZX./
+
+An admin account is also created automatically that allows you to view all reservation histories. The login is below:
+email: easyhomefdunoreply@gmail.com
+password: admin123

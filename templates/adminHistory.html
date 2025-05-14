@@ -1,0 +1,33 @@
+{%extends "base.html"%}
+{%block title%}All Reservation History{%endblock%}
+
+{%block content%}
+<section id="start">
+<div class="row">
+    <h2>View the Reservation History</h2>
+    <div class="main">
+    <table class="table table-striped table-light">
+      <thead>
+        <tr>
+          <th scope="col">User ID</th>
+          <th scope="col">Professional ID</th>
+          <th scope="col">Project Title</th>
+          <th scope="col">Project Date</th>
+          <th scope="col">Project Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for reserve in reservations %}
+        <tr>
+            <td>{{ reserve.user_id }}</td>  
+            <td>{{ reserve.professional_id }}</td>  
+            <td>{{ reserve.work_name }}</td>
+            <td>{{ reserve.start_date }}</td>
+            <td>{{ reserve.start_time }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+  </div>
+  </section>
+{%endblock%}

@@ -50,7 +50,7 @@
               </div>
               <div class="col-6">
                 <div data-mdb-input-init class="form-outline mb-3 w-33">
-                  <div class="dropdown mb-2">
+                  <!-- <div class="dropdown mb-2">
                     <button class="btn btn-secondary dropdown-toggle" type="button" id="projectTypeDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                       Type of Project
                     </button>
@@ -60,8 +60,8 @@
                       <li><a class="dropdown-item" href="#" data-hours="3">Replace door - 3 hours</a></li>
                       <li><a class="dropdown-item" href="#" data-hours="2">Replace light fixture - 2 hours</a></li>
                     </ul>
-                  </div>
-                  <input type="hidden" id="hoursInput" class="form-control" name="hour_amount" placeholder="Enter hours" />
+                  </div> -->
+                  <input type="number" id="hoursInput" class="form-control" name="hour_amount" placeholder="Enter hours" />
                   <label class="form-label" for="hoursInput">Predicted Hour Amount</label>
                 </div> 
               </div>
@@ -98,7 +98,7 @@
 
   document.getElementById("hoursInput").addEventListener("input", updateCost);
 
-  // Handle dropdown selection
+  // dropdown
   document.querySelectorAll(".dropdown-item").forEach(function (item) {
     item.addEventListener("click", function (e) {
       e.preventDefault();
@@ -107,6 +107,29 @@
       updateCost();
       document.getElementById("projectTypeDropdown").textContent = this.textContent;
     });
+  
+  document.querySelector("form").addEventListener("submit", function (e) {
+    const startDate = document.getElementById("startDate").value;
+    const endDate = document.getElementById("endDate").value;
+
+    // Clear any existing alerts or errors
+    if (document.getElementById("dateError")) {
+      document.getElementById("dateError").remove();
+    }
+
+    if (startDate && endDate && endDate < startDate) {
+      e.preventDefault(); // Stop form submission
+
+     
+      const errorDiv = document.createElement("div");
+      errorDiv.id = "dateError";
+      errorDiv.className = "text-danger my-2";
+      errorDiv.textContent = "End date must be after or equal to the start date.";
+
+      
+      this.querySelector(".row").appendChild(errorDiv);
+    }
+  });
   });
 </script>
 

@@ -66,6 +66,24 @@ def init_db():
               )
             """)
         
+        c.execute("""
+             CREATE TABLE IF NOT EXISTS workHistory (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                work_name VARCHAR2(50),
+                work_description VARCHAR2(100),
+                user_id INTEGER NOT NULL,
+                professional_id INTEGER NOT NULL,
+                total_cost REAL,
+                hour_amount INTEGER,
+                start_date DATE,
+                end_date DATE,
+                start_time TIME,
+                is_paid BOOLEAN DEFAULT 0,
+                FOREIGN KEY (user_id) REFERENCES users(id),
+                FOREIGN KEY (professional_id) REFERENCES professionals(id)
+              )
+            """)
+        
         conn.commit()
         print("Database initialization successful")
     
@@ -85,6 +103,7 @@ def reset_db():
         cursor.execute("DROP TABLE IF EXISTS professionals")
         cursor.execute("DROP TABLE IF EXISTS reviews")
         cursor.execute("DROP TABLE IF EXISTS workDetails")
+        cursor.execute("DROP TABLE IF EXISTS workHistory")
 
         conn.commit()
         print("All tables have been reset successfully")
